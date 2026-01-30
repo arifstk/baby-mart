@@ -1,0 +1,176 @@
+Next. JS full stack  Project Bangla: 26/01/2026 (Video Link):
+https://www.youtube.com/watch?v=YOfx--j3A48&list=PL4JYC8uutjoKrL8IcPzIkQgreXQpY3rAq&index=3
+
+
+Create a folder: baby-mart
+create 3 subfolder: admin, client & server
+
+to go any directory "cd admin" / cd client / cd server
+
+ 
+ADMIN:
+	cd admin
+	
+
+CLIENT:
+	cd client
+
+
+SERVER:
+	cd server
+	npm init
+
+arifs@ARIF-PC MINGW64 /e/project/full-stack/baby-mart/server
+$ npm init
+This utility will walk you through creating a package.json file.
+It only covers the most common items, and tries to guess sensible defaults.
+
+See `npm help init` for definitive documentation on these fields
+and exactly what they do.
+
+Use `npm install <pkg>` afterwards to install a package and
+save it as a dependency in the package.json file.
+
+Press ^C at any time to quit.
+package name: (server)
+version: (1.0.0)
+description:
+entry point: (index.js)
+test command:
+git repository:
+keywords:
+author: arif
+license: (ISC)
+type: (commonjs)
+About to write to E:\project\full-stack\baby-mart\server\package.json:
+
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "arif",
+  "license": "ISC",
+  "type": "commonjs"
+}
+
+
+Is this OK? (yes) yes
+
+
+$ node
+$ node
+Welcome to Node.js v24.11.1.
+Hello World!
+undefined
+> .exit
+Hello World!
+undefined
+Hello World!
+undefined
+aby-mart/server
+$ touch index.js
+
+arifs@ARIF-PC MINGW64 /e/project/full-stack/baby-mart/server
+$ node index.js
+Hello from Server!
+
+npm i nodemon 
+
+to run the server: npm start 
+
+"scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js",
+    "dev": "nodemon index.js"
+  },
+
+
+
+
+ADMIN:
+	npm i (to install all npm init in admin"
+	install tailwind in admin
+
+
+SERVER: 
+	npm install express --save 
+	in package.json file change this "type": "commonjs" to "type": "module"
+	change the index.js file const express = require('express'); to import express from "express"; 
+
+	create server .env file & set: 
+		PORT = 8000
+		MONGODB_URI=
+		JWT_SECRET=
+		CLOUDINARY_API_KEY=
+		CLOUDINARY_API_SECRET=
+		ADMIN_URL=http://localhost:5173/
+		CLIENT_URL=http://localhost:3000/
+
+	go to npm & search the dotenv > then install this npm i dotenv > 
+	import dotenv from "dotenv"; > dotenv.config(); (index.js file)   // load env Server 
+
+
+SERVER: 
+	server> index.js file configuration
+	// load env Server
+	// Connect to Database
+	// Core's configuration
+	// Increase body size limit for JSON & URL-encoded payloads 
+	// Routes
+	// API Documentation
+	// Home Route
+	// Error Handler
+	// Start Server setup
+
+Install Postman (to check server req & res): collection > new collection > send request & check the output. 
+
+SERVER: 
+	create routes>authRoutes.js file and configure this file. 
+	install express-async-handler  npm i express-async-handler (to post registerUser & loginUser)
+ 
+	authController.js file: 
+	const registerUser = asyncHandler(async(req,res)=> {
+  const bodyProps = req.body;
+  res.send("Register is working");
+	console.log(bodyProps);
+}) 
+
+then index.js file: // Increase body size limit for JSON & URL-encoded payloads.
+	app.use(express.json()); 
+
+
+MONGODB:
+	create an account in mongodb.com
+	set Database user admin and pass: admin/any password
+	set Network access to 0.0.0.0/0 
+	go to Cluster and click Connect > Compass > (copy) mongodb+srv://admin:<db_password>@cluster0.kql6mr4.mongodb.net/ 
+	Then set this link to project .env file (MONGODB_URI="mongodb+srv://admin:Arif1990@cluster0.kql6mr4.mongodb.net/baby-mart?retryWrites=true&w=majority&appName=Cluster0")
+	Install Mongoose from NPM > npm i mongoose 
+Connect MONGODB:  in db.js file > import mongoose from "mongoose";
+
+const connectDB = async()=> {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    console.log( `MongoDB is Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error: ${error?.message}`);
+    process.exit(1);
+  }
+}
+
+export default connectDB; 
+
+in index.js file >
+// Connect to Database
+connectDB();
+
+
+
+
+
+
+
