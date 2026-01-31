@@ -36,7 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
 // User login
 const loginUser = asyncHandler(async (req, res) => {
   // res.send("login is working!!!");
-  const { email, password } = await req.body;
+  const { email, password } = req.body;
   // console.log("Login attempt:", { email });
 
   const user = await User.findOne({ email });
@@ -63,7 +63,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 // Get User Profile
 const getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.body._id);
+  const user = await User.findById(req.user._id);
   if (user) {
     res.json({
       _id: user._id,
