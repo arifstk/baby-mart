@@ -3,12 +3,18 @@
 // import viteLogo from '/vite.svg'
 // import './App.css'
 
+import CommonLayout from "./components/common/CommonLayout"
+import { Button } from "./components/ui/button"
+
 function App() {
 
   return (
     <div>
-      <h2>Admin Panel</h2>
-      <p>Baby mart E-commerce</p>
+      <CommonLayout>
+        <h2>Admin Panel</h2>
+        <p>Baby mart E-commerce</p>
+        <Button className="text-2xl p-5 hover:bg-gray-300 hover:text-black transition duration-200">Button</Button>
+      </CommonLayout>
     </div>
   )
 }
