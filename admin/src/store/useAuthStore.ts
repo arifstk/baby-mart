@@ -64,7 +64,9 @@ const useAuthStore = create<AuthState>()(
           user: null,
           token: null,
           isAuthenticated: false,
-        })
+        });
+        // Clear persisted storage
+        localStorage.removeItem("auth-storage");
       },
       checkIsAdmin: ()=> {
         const user = get().user;

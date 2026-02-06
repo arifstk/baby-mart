@@ -65,7 +65,7 @@ const RegisterPage = () => {
       >
         <Card className="p-6 shadow-xl">
           <h1 className="text-3xl font-bold text-center text-gray-800">Create an Account</h1>
-          <CardDescription className="text-gray-500 text-center">
+          <CardDescription className="text-gray-500 text-center -mt-5">
             Enter your details to sign up
           </CardDescription>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

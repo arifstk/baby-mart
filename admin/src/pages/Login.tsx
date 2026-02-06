@@ -58,7 +58,6 @@ export default function Login() {
       navigate("/dashboard");
     } catch (error) {
       console.error("Fail to login", error);
-
     } finally {
       setIsLoading(false);
     }
@@ -81,7 +80,7 @@ export default function Login() {
       >
         <Card className="p-6 shadow-xl">
           <h1 className="text-3xl font-bold text-center text-gray-800">Admin Dashboard</h1>
-          <CardDescription className="text-gray-500 text-center">
+          <CardDescription className="text-gray-500 text-center -mt-5">
             Enter your credentials to sign in
           </CardDescription>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

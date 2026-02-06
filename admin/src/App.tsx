@@ -11,7 +11,7 @@ import { cn } from "./lib/utils";
 import useAuthStore from "./store/useAuthStore";
 
 function App() {
-  const isAuthenticated = useAuthStore();
+  const isAuthenticated = useAuthStore((state)=> state.isAuthenticated);
 
   if(!isAuthenticated) {
     return <Navigate to={"/login"} />
