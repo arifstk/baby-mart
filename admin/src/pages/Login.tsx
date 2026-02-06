@@ -15,6 +15,8 @@ import { motion } from "framer-motion"
 import { useState } from "react"
 import { Link, useNavigate } from "react-router"
 import { loginSchema } from "@/lib/validation"
+import { Loader2 } from "lucide-react";
+import useAuthStore from "@/store/useAuthStore"
 // import { useNavigate } from "react-router-dom"
 
 // const schema = z.object({
@@ -27,8 +29,9 @@ import { loginSchema } from "@/lib/validation"
 type FormData = z.infer<typeof loginSchema>
 
 export default function Login() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const {login}= useAuthStore();
 
   //2: 
   // const form = useForm <FormData>({
@@ -47,14 +50,24 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit =async (data: FormData) => {
     setIsLoading(true)
-    console.log("Login data:", data)
+    // console.log("Login data:", data);
+    try {
+      await login(data);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Fail to login", error);
+
+    } finally {
+      setIsLoading(false);
+    }
+
     // TODO: API call here
-    setTimeout(() => {
-      setIsLoading(false)
-      navigate("/dashboard")
-    }, 1500)
+    // setTimeout(() => {
+    //   setIsLoading(false)
+    //   navigate("/dashboard")
+    // }, 1500)
   }
 
   return (
@@ -84,14 +97,17 @@ export default function Login() {
 
               <Field>
                 <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Input id="password" type="password" {...register("password")} placeholder="Enter your password" />
+                <Input id="password" type="password" {...register("password")} placeholder="Enter your password" disabled={isLoading} />
                 {/* <FieldDescription>Password at least 6 characters</FieldDescription> */}
                 {errors.password && <FieldError>{errors.password.message}</FieldError>}
               </Field>
             </FieldSet>
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Loading..." : "Login"}
+              {isLoading ?
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="animate-spin" /> Signing in...
+                </span> : "Login"}
             </Button>
 
             <CardFooter className="flex items-center justify-center">

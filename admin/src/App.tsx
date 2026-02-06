@@ -8,9 +8,10 @@ import { Navigate, Outlet } from "react-router";
 import Sidebar from "./components/dashboard/Sidebar";
 import Header from "./components/common/Header";
 import { cn } from "./lib/utils";
+import useAuthStore from "./store/useAuthStore";
 
 function App() {
-  const isAuthenticated = false;
+  const isAuthenticated = useAuthStore();
 
   if(!isAuthenticated) {
     return <Navigate to={"/login"} />

@@ -32,7 +32,21 @@ const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
-      login: async(credentials)=>{},
+      login: async(credentials)=>{
+        try {
+          const response = await api.post("/auth/login", credentials);
+          if(response.data.token) {
+            set({
+              user:response.data,
+              token:response.data.token,
+              isAuthenticated: true,
+            })
+          }
+        } catch (error) {
+          console.error("Login error:",error);
+          throw error;
+        }
+      },
 
       register: async (userData) => {
         try {
@@ -45,7 +59,13 @@ const useAuthStore = create<AuthState>()(
           throw error;          
         }
       },
-      logout: ()=>{},
+      logout: ()=>{
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+        })
+      },
       checkIsAdmin: ()=> {
         const user = get().user;
         return user?.role === "admin";
