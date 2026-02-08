@@ -1,16 +1,16 @@
 // import React from 'react'
 
-import { Button } from "@/components/ui/button"
-import useAuthStore from "@/store/useAuthStore"
+// import { Button } from "@/components/ui/button"
+// import useAuthStore from "@/store/useAuthStore"
 
 const DashboardPage = () => {
-  const {logout}=useAuthStore();
+  // const {logout}=useAuthStore();
 
   return (
     <div className="p-10">
-      <Button variant={"destructive"} onClick={()=>logout()} >
+      {/* <Button variant={"destructive"} onClick={()=>logout()} >
         Logout
-      </Button>
+      </Button> */}
     </div>
   )
 }

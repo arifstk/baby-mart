@@ -4,31 +4,79 @@ import { cn } from "@/lib/utils"
 import useAuthStore from "@/store/useAuthStore";
 import { AnimatePresence, motion } from "motion/react";
 import { Button } from "../ui/button";
-import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
-// import {
-//   LayoutDashboard,
-//   Users,
-//   ShoppingBag,
-//   Tag,
-//   Bookmark,
-//   LogOut,
-//   ChevronLeft,
-//   ChevronRight,
-//   Layers,
-//   Package,
-//   User,
-//   FileText,
-// } from "lucide-react";
+import { Bookmark, ChevronLeft, ChevronRight, FileText, Layers, LayoutDashboard, LogOut, Package, ShoppingBag, Tag, User, Users } from "lucide-react";
+import { NavLink, useLocation } from "react-router";
 
 interface Props {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+};
+
+interface navItemsProps {
+  to: string,
+  icon: React.ReactNode,
+  label: string,
   open: boolean,
-  setOpen: (open: boolean) => void,
-}
+  end?: boolean,
+  pathname: string,
+};
+
+// const navigationItems = [{ to: "/dashboard", icon: <LayoutDashboard size={20} />, label: "Dashboard", end: true, },];
+
+// Routes
+const navigationItems = [
+  {
+    to: "/dashboard",
+    icon: <LayoutDashboard size={20} />,
+    label: "Dashboard",
+    end: true,
+  },
+  {
+    to: "/dashboard/account",
+    icon: <User size={20} />,
+    label: "Account",
+  },
+  {
+    to: "/dashboard/users",
+    icon: <Users size={20} />,
+    label: "Users",
+  },
+  {
+    to: "/dashboard/orders",
+    icon: <Package size={20} />,
+    label: "Orders",
+  },
+  {
+    to: "/dashboard/invoices",
+    icon: <FileText size={20} />,
+    label: "Invoices",
+  },
+  {
+    to: "/dashboard/banners",
+    icon: <Layers size={20} />,
+    label: "Banners",
+  },
+  {
+    to: "/dashboard/products",
+    icon: <ShoppingBag size={20} />,
+    label: "Products",
+  },
+  {
+    to: "/dashboard/categories",
+    icon: <Tag size={20} />,
+    label: "Categories",
+  },
+  {
+    to: "/dashboard/brands",
+    icon: <Bookmark size={20} />,
+    label: "Brands",
+  },
+];
+
 
 const Sidebar = ({ open, setOpen }: Props) => {
   const { user, logout } = useAuthStore();
-
-
+  const { pathname } = useLocation(); //Active Link mark
 
   return (
     <motion.aside className={cn("fixed inset-y-0 left-0 z-20 flex flex-col border-r border-r-slate-800/50 bg-linear-to-b from-slate-500 via-slate-800 to-900 shadow-2xl hoverEffect text-white", open ? "w-64" : "w-20")}
@@ -60,6 +108,17 @@ const Sidebar = ({ open, setOpen }: Props) => {
       </div>
       {/* Sidebar Content */}
       <div className="flex flex-col gap-1 flex-1 bg-linear-to-b from-slate-900 to-slate-800/50">
+        {navigationItems?.map((item) => (
+          <NavItem
+            key={item.to}
+            to={item.to}
+            icon={item.icon}
+            label={item.label}
+            open={open}
+            end={item.end}
+            pathname={pathname}
+          />
+        ))}
       </div>
 
       <div className="flex flex-col gap-1 bg-linear-to-b from-slate-900 to-slate-800/50 overflow-hidden">
@@ -78,19 +137,16 @@ const Sidebar = ({ open, setOpen }: Props) => {
               transition={{ duration: 0.2 }}
               exit={{ opacity: 0, x: -10 }}
             >
-              <p className="text-sm font-medium">{user?.name}</p>
-              <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
+              <p className="text-sm font-medium text-white">{user?.name}</p>
+              <p className="text-xs font-medium text-green-400  capitalize">{user?.role}</p>
             </motion.div>}
           </AnimatePresence>
-          {/* <div>
-            <p className="text-sm font-medium">{user?.name}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
-          </div> */}
+
         </motion.div>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
           <Button variant={"outline"} size={open ? "default" : "icon"}
             onClick={logout}
-            className="w-full border-red-500/30 hover:bg-red-6--/20 hover:border-red-400/50 text-red-400 transition-colors bg-red-600/10 backdrop-blur-sm"
+            className="w-full border-red-500/30 hover:bg-red-600/20 hover:border-red-400/50 text-red-400 hover:text-white transition-colors bg-red-600/10 backdrop-blur-sm"
           >
             <LogOut size={16} className={cn("mr-2", !open && "mr-0")} />
             {open && "Logout"}
@@ -101,7 +157,56 @@ const Sidebar = ({ open, setOpen }: Props) => {
 
     </motion.aside>
   )
+};
+
+// sidebar items
+function NavItem({ to, icon, label, open, end, pathname }: navItemsProps) {
+//   // console.log("items", item);
+  return <NavLink
+  to={to}
+  end={end}
+  className={cn("flex items-center gap-2 p-3 rounded-xl text-sm font-medium hoverEffect overflow-hidden text-white/80 hover:bg-linear-to-r hover:from-slate-700/50 hover:to-slate-600/50 hover:text-white hover:shadow-lg hover:backdrop-blur-sm", pathname === to ? "bg-linear-to-r from-slate-700/50 to-slate-600/50 text-teal-500 shadow-lg backdrop-blur-sm" : "hover:scale-102" )} >
+    <span>{icon}</span>{open && label}
+  </NavLink>
 }
+
+
+// function NavItem({ to, icon, label, open, end, pathname }: navItemsProps) {
+//   const isActive = pathname === to;
+
+//   return (
+//     <NavLink
+//       to={to}
+//       end={end}
+//       className={cn(
+//         "rounded-xl text-sm font-medium transition-all duration-300 overflow-hidden text-white/80",
+
+//         open
+//           ? // ===== OPEN SIDEBAR =====
+//             cn(
+//               "flex items-center gap-2 p-3 hoverEffect",
+//               "hover:bg-linear-to-r hover:from-slate-700/50 hover:to-slate-600/50 hover:text-white",
+//               "hover:shadow-lg hover:backdrop-blur-sm",
+//               isActive
+//                 ? "bg-linear-to-r from-slate-700/50 to-slate-600/50 text-teal-500 shadow-lg backdrop-blur-sm"
+//                 : "hover:scale-102"
+//             )
+//           : // ===== CLOSED SIDEBAR =====
+//             cn(
+//               "flex items-center justify-center",
+//               "w-12 h-12 mx-auto",
+//               "hoverEffect",
+//               "hover:bg-white/10 hover:text-white",
+//               isActive && "bg-white/15 text-teal-500"
+//             )
+//       )}
+//     >
+//       <span className="text-lg leading-none">{icon}</span>
+//       {open && <span>{label}</span>}
+//     </NavLink>
+//   );
+// }
+
 
 export default Sidebar
 
