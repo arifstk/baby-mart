@@ -168,43 +168,4 @@ function NavItem({ to, icon, label, open, end, pathname }: navItemsProps) {
   </NavLink>
 }
 
-
-// function NavItem({ to, icon, label, open, end, pathname }: navItemsProps) {
-//   const isActive = pathname === to;
-
-//   return (
-//     <NavLink
-//       to={to}
-//       end={end}
-//       className={cn(
-//         "rounded-xl text-sm font-medium transition-all duration-300 overflow-hidden text-white/80",
-
-//         open
-//           ? // ===== OPEN SIDEBAR =====
-//             cn(
-//               "flex items-center gap-2 p-3 hoverEffect",
-//               "hover:bg-linear-to-r hover:from-slate-700/50 hover:to-slate-600/50 hover:text-white",
-//               "hover:shadow-lg hover:backdrop-blur-sm",
-//               isActive
-//                 ? "bg-linear-to-r from-slate-700/50 to-slate-600/50 text-teal-500 shadow-lg backdrop-blur-sm"
-//                 : "hover:scale-102"
-//             )
-//           : // ===== CLOSED SIDEBAR =====
-//             cn(
-//               "flex items-center justify-center",
-//               "w-12 h-12 mx-auto",
-//               "hoverEffect",
-//               "hover:bg-white/10 hover:text-white",
-//               isActive && "bg-white/15 text-teal-500"
-//             )
-//       )}
-//     >
-//       <span className="text-lg leading-none">{icon}</span>
-//       {open && <span>{label}</span>}
-//     </NavLink>
-//   );
-// }
-
-
 export default Sidebar
-
