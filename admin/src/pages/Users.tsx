@@ -6,13 +6,29 @@ import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import useAuthStore from "@/store/useAuthStore";
 import { Edit, Eye, Plus, RefreshCw, Trash, Users2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { UserType } from "../../type";
+import type { User, UserType } from "../../type";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+
 
 const Users = () => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [refreshing, setRefreshing] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [formLoading, setFormLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
+  const [totalPage, setTotalPage] = useState(1);
+
   const axiosPrivate = useAxiosPrivate();
   const { checkIsAdmin } = useAuthStore();
   const isAdmin = checkIsAdmin();
@@ -69,8 +85,9 @@ const Users = () => {
           {
             isAdmin &&
             <Button
+              onClick={() => setIsAddModalOpen(true)}
               variant={"outline"}
-              className="border-blue-600 text-blue-600 hover:bg-blue-50">
+              className="bg-blue-600 text-white hover:bg-blue-50">
               <Plus /> Add User
             </Button>
           }
@@ -96,7 +113,7 @@ const Users = () => {
             {users?.length > 0 ? (users?.map((user) => (
               <TableRow key={user?._id}>
                 <TableCell>
-                  <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
+                  <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
                     {user?.avatar ? <img src={user?.avatar} alt="img" className="w-ful h-full" /> : <span className="text-lg font-semibold text-black">{user?.name.charAt(0).toUpperCase()}</span>}
                   </div>
                 </TableCell>
@@ -128,6 +145,8 @@ const Users = () => {
           </TableBody>
         </Table>
       </div>
+      {/* Add user Modal  */}
+      
     </div>
   )
 }
