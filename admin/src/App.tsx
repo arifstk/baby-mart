@@ -27,7 +27,7 @@ function App() {
         <motion.div className={cn("flex flex-col flex-1 hoverEffect max-w-[--breakpoint-2xl]")}
         initial={{ marginLeft: sidebarOpen ? 256 : 80 }}   // px values for ml-64 and ml-20
         animate={{ marginLeft: sidebarOpen ? 256 : 80 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
         >
         {/* <div className={cn("flex flex-col flex-1 hoverEffect max-w-[--breakpoint-2xl]")} initial={{ marginLeft: sidebarOpen ? 256 : 80 }} // px values for ml-64 and ml-20 animate={{ marginLeft: sidebarOpen ? 256 : 80 }} transition={{ duration: 0.2, ease: "easeInOut" }} > */}
         <Header />

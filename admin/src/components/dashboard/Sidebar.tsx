@@ -82,7 +82,7 @@ const Sidebar = ({ open, setOpen }: Props) => {
     <motion.aside className={cn("fixed inset-y-0 left-0 z-20 flex flex-col border-r border-r-slate-800/50 bg-linear-to-b from-slate-500 via-slate-800 to-900 shadow-2xl hoverEffect text-white", open ? "w-64" : "w-15")}
       initial={{ width: open ? 256 : 80 }}
       animate={{ width: open ? 256 : 80 }}
-      transition={{ duration: 0.3, ease: "easeInOut" }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
     >
       <div className="flex items-center justify-between p-4 h-16 bg-linear-to-r from-[#29beb3] via-slate-700 to-[#a96bde] border-b border-slate-600/50">
         <motion.div
@@ -125,7 +125,7 @@ const Sidebar = ({ open, setOpen }: Props) => {
         <motion.div className={cn("flex items-center gap-3 px-3 mb-3", open ? "justify-start" : "justify-center")}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
+          transition={{ duration: 0.2, ease: "easeInOut" }}
         >
           <div>
             {user?.avatar ? <img src={user?.avatar} alt="img" className="h-full w-full object-cover" /> : user?.name?.charAt(0).toUpperCase()}
@@ -159,13 +159,28 @@ const Sidebar = ({ open, setOpen }: Props) => {
 
 // sidebar items
 function NavItem({ to, icon, label, open, end, pathname }: navItemsProps) {
-//   // console.log("items", item);
+  //   // console.log("items", item);
   return <NavLink
-  to={to}
-  end={end}
-  className={cn("flex items-center gap-2 p-3 rounded-xl text-sm font-medium hoverEffect overflow-hidden text-white/80 hover:bg-linear-to-r hover:from-slate-700/50 hover:to-slate-600/50 hover:text-white hover:shadow-lg hover:backdrop-blur-sm", pathname === to ? "bg-linear-to-r from-slate-700/50 to-slate-600/50 text-teal-500 shadow-lg backdrop-blur-sm" : "hover:scale-102")} >
-    <span>{icon}</span>{open && label}
+    to={to}
+    end={end}
+    className={cn("flex items-center gap-2 p-3 rounded-xl text-sm font-medium hoverEffect overflow-hidden text-white/80 hover:bg-linear-to-r hover:from-slate-700/50 hover:to-slate-600/50 hover:text-white hover:shadow-lg hover:backdrop-blur-sm", pathname === to ? "bg-linear-to-r from-slate-700/50 to-slate-600/50 text-teal-500 shadow-lg backdrop-blur-sm" : "hover:scale-102")} >
+    <span className={cn(
+      "shrink-0",
+      open ? "mr-2" : "flex w-full justify-center"
+    )}>
+      {icon}
+    </span>
+    {open &&
+      <motion.span
+        initial={{ opacity: 0, x: -60 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -40 }}
+        transition={{ duration: 0.4, ease: "easeInOut" }} >
+        {label}
+      </motion.span>
+    }
   </NavLink>
 }
 
 export default Sidebar
+
