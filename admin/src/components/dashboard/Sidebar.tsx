@@ -163,7 +163,7 @@ function NavItem({ to, icon, label, open, end, pathname }: navItemsProps) {
   return <NavLink
     to={to}
     end={end}
-    className={cn("flex items-center gap-2 p-3 rounded-xl text-sm font-medium hoverEffect overflow-hidden text-white/80 hover:bg-linear-to-r hover:from-slate-700/50 hover:to-slate-600/50 hover:text-white hover:shadow-lg hover:backdrop-blur-sm", pathname === to ? "bg-linear-to-r from-slate-700/50 to-slate-600/50 text-teal-500 shadow-lg backdrop-blur-sm" : "hover:scale-102")} >
+    className={cn("flex items-center gap-2 p-2 mr-2 ml-2 rounded-xl text-sm font-medium hoverEffect overflow-hidden text-white/80 hover:bg-linear-to-r hover:from-slate-700/50 hover:to-slate-600/50 hover:text-white hover:shadow-lg hover:backdrop-blur-sm", pathname === to ? "bg-linear-to-r from-slate-700/50 to-slate-600/50 text-teal-500 shadow-lg backdrop-blur-sm" : "hover:scale-102")} >
     <span className={cn(
       "shrink-0",
       open ? "mr-2" : "flex w-full justify-center"

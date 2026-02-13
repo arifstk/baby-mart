@@ -92,6 +92,7 @@ const Users = () => {
       email: "",
       password: "",
       role: "user",
+      avatar: "",
     },
   });
 
@@ -231,7 +232,7 @@ const Users = () => {
                   </div>
                 </TableCell>
               </TableRow>
-            ))) : <div>No users</div>}
+            ))) : <div className="text-lg font-semibold p-5">No users</div>}
           </TableBody>
         </Table>
       </div>
