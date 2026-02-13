@@ -1,4 +1,5 @@
-// const express = require('express')
+// index.js (server) 
+
 import express from "express";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
