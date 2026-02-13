@@ -1,4 +1,3 @@
-// import React from 'react'
 
 import useAuthStore from "@/store/useAuthStore"
 import { Button } from "../ui/button";
@@ -8,7 +7,7 @@ const Header = () => {
   const { user } = useAuthStore();
 
   return (
-    <header className="sticky top-0 flex items-center h-16 bg-background border-b border-border px-4 ">
+    <header className="sticky top-0 flex items-center h-16 bg-background border-b border-border px-4 py-2 z-50">
       <div className="flex items-center gap-4 ml-auto">
         <Button variant={"ghost"} size={"icon"} className="rounded-full border border-border">
           <Bell size={18} />

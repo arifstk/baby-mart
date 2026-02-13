@@ -79,7 +79,7 @@ const Sidebar = ({ open, setOpen }: Props) => {
   const { pathname } = useLocation(); //Active Link mark
 
   return (
-    <motion.aside className={cn("fixed inset-y-0 left-0 z-20 flex flex-col border-r border-r-slate-800/50 bg-linear-to-b from-slate-500 via-slate-800 to-900 shadow-2xl hoverEffect text-white", open ? "w-64" : "w-20")}
+    <motion.aside className={cn("fixed inset-y-0 left-0 z-20 flex flex-col border-r border-r-slate-800/50 bg-linear-to-b from-slate-500 via-slate-800 to-900 shadow-2xl hoverEffect text-white", open ? "w-64" : "w-15")}
       initial={{ width: open ? 256 : 80 }}
       animate={{ width: open ? 256 : 80 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -125,7 +125,7 @@ const Sidebar = ({ open, setOpen }: Props) => {
         <motion.div className={cn("flex items-center gap-3 px-3 mb-3", open ? "justify-start" : "justify-center")}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
         >
           <div>
             {user?.avatar ? <img src={user?.avatar} alt="img" className="h-full w-full object-cover" /> : user?.name?.charAt(0).toUpperCase()}
@@ -134,7 +134,7 @@ const Sidebar = ({ open, setOpen }: Props) => {
             {open && <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.1 }}
               exit={{ opacity: 0, x: -10 }}
             >
               <p className="text-sm font-medium text-white">{user?.name}</p>
