@@ -4,16 +4,28 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import useAuthStore from "@/store/useAuthStore";
-import { Edit, Eye, Plus, RefreshCw, Trash, Users2 } from "lucide-react";
+import { Edit, Eye, Loader2, Plus, RefreshCw, Trash, Upload, Users2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { User, UserType } from "../../type";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Field, FieldError, FieldLabel, FieldSet } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { userSchema } from "@/lib/validation";
+import type z from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
+
+type FormData = z.infer<typeof userSchema>
 
 const Users = () => {
   const [users, setUsers] = useState<UserType[]>([]);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+
+  // const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [refreshing, setRefreshing] = useState(false);
@@ -65,6 +77,83 @@ const Users = () => {
         return "bg-gray-100 text-gray-800";
     }
   };
+
+  // Add Users 
+  const {
+    register,
+    setValue,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(userSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      role: "user",
+    },
+  });
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setAvatarFile(e.target.files[0]);
+    }
+  };
+
+
+  // Create Users Submit function
+  const onSubmit = async (data: FormData) => {
+    setFormLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      formData.append("role", data.role);
+
+      if (avatarFile) {
+        formData.append("avatar", avatarFile);
+      }
+
+      await axiosPrivate.post("/users", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      reset();
+      setAvatarFile(null);
+      setIsAddModalOpen(false);
+      fetchUsers(); // refresh list
+    } catch (error) {
+      console.error("Failed to create user", error);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+
+
+  // const onSubmit = async (data: FormData) => {
+  //   setIsLoading(true);
+  //   // console.log("register data:", data);
+  //   // TODO: API call here
+  //   // setTimeout(() => {
+  //   //   setIsLoading(false)
+  //   //   navigate("/dashboard")
+  //   // }, 1500)
+  //   try {
+  //     await registerUser(data);
+  //     console.log("Registration successful:");
+  //     // navigate("/login");
+
+  //   } catch (error) {
+  //     console.log("Fail to register", error);}
+
+  //   // } finally {
+  //   //   setIsLoading(false);
+  //   // }
+  // };
 
   return (
     <div className="p-6 space-y-4">
@@ -153,6 +242,91 @@ const Users = () => {
             <DialogTitle>Add Users</DialogTitle>
             <DialogDescription>Create a new user account</DialogDescription>
           </DialogHeader>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <FieldSet>
+              {/* Name */}
+              <Field>
+                <FieldLabel>Name</FieldLabel>
+                <Input {...register("name")} placeholder="Full name" />
+                {errors.name && <FieldError>{errors.name.message}</FieldError>}
+              </Field>
+
+              {/* Email */}
+              <Field>
+                <FieldLabel>Email</FieldLabel>
+                <Input {...register("email")} placeholder="email@example.com" />
+                {errors.email && <FieldError>{errors.email.message}</FieldError>}
+              </Field>
+
+              {/* Password */}
+              <Field>
+                <FieldLabel>Password</FieldLabel>
+                <Input type="password" {...register("password")} />
+                {errors.password && <FieldError>{errors.password.message}</FieldError>}
+              </Field>
+
+              {/* Role */}
+              <Field>
+                <FieldLabel>Role</FieldLabel>
+                <Select
+                  defaultValue="user"
+                  onValueChange={(value) =>
+                    setValue("role", value as FormData["role"])
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="deliveryman">Delivery Man</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+
+              {/* Avatar */}
+              <Field>
+                <FieldLabel>Avatar</FieldLabel>
+                <label className="border border-dashed rounded-lg p-6 flex flex-col items-center cursor-pointer">
+                  {avatarFile ? (
+                    <img
+                      src={URL.createObjectURL(avatarFile)}
+                      className="h-24 w-24 rounded-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      <Upload className="w-8 h-8 text-gray-400" />
+                      <p className="text-sm text-gray-500">Click to upload</p>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleAvatarChange}
+                  />
+                </label>
+              </Field>
+
+              {/* Footer */}
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsAddModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+
+                <Button type="submit" disabled={formLoading}>
+                  {formLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Create User
+                </Button>
+              </div>
+            </FieldSet>
+          </form>
+
         </DialogContent>
       </Dialog>
     </div>

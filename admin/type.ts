@@ -17,3 +17,13 @@ export interface User {
   createdAt: string;
 }
 
+// type AddUserForm = {
+//   name: string
+//   email: string
+//   password: string
+//   role: "user" | "admin" | "deliveryman"
+//   avatar?: FileList
+// }
+
+
+
