@@ -11,6 +11,7 @@ import { cn } from "./lib/utils";
 import useAuthStore from "./store/useAuthStore";
 import { useState } from "react";
 import { motion } from "motion/react";
+import { Toaster } from "sonner";
 
 function App() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -35,6 +36,7 @@ function App() {
           <Outlet />
         </main>
       </motion.div>
+      <Toaster richColors position="top-right" />
     </div >
   )
 }

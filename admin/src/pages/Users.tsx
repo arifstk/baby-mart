@@ -17,6 +17,7 @@ import type z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from 'sonner';
 
 
 type FormData = z.infer<typeof userSchema>
@@ -65,6 +66,39 @@ const Users = () => {
   }, []);
   // console.log("users", users);
 
+  // Refresh Users
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const response = await axiosPrivate.get("/users", {
+        params: {
+          page,
+          perPage,
+          role: roleFilter !== "alt" ? roleFilter : undefined,
+        }
+      });
+      // console.log("response", response);
+      // Handle paginated and non-paginated response
+      if (response.data) {
+        setUsers(response.data);
+        // setTotal(response.data.total || response.data.users.length);
+        // setTotalPages(response.data.totalPages || 1);
+      } else {
+        setUsers(response.data);
+        // setTotal(response.data.length);
+        // setTotalPages();
+      }
+      
+    } catch (error) {
+      console.log("Failed to refresh users", error);
+      toast("Failed to refresh users");
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+
+  // Role color 
   const getRoleColor = (role: string) => {
     switch (role) {
       case "admin":
@@ -121,6 +155,7 @@ const Users = () => {
       await axiosPrivate.post("/users", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      toast.success("✅ User added successfully");
 
       reset();
       setAvatarFile(null);
@@ -132,29 +167,6 @@ const Users = () => {
       setFormLoading(false);
     }
   };
-
-
-
-  // const onSubmit = async (data: FormData) => {
-  //   setIsLoading(true);
-  //   // console.log("register data:", data);
-  //   // TODO: API call here
-  //   // setTimeout(() => {
-  //   //   setIsLoading(false)
-  //   //   navigate("/dashboard")
-  //   // }, 1500)
-  //   try {
-  //     await registerUser(data);
-  //     console.log("Registration successful:");
-  //     // navigate("/login");
-
-  //   } catch (error) {
-  //     console.log("Fail to register", error);}
-
-  //   // } finally {
-  //   //   setIsLoading(false);
-  //   // }
-  // };
 
   return (
     <div className="p-6 space-y-4">
@@ -170,8 +182,13 @@ const Users = () => {
           </div>
           <Button
             variant={"outline"}
+            onClick={handleRefresh}
+            disabled={refreshing}
             className="border-blue-600 text-blue-600 hover:bg-blue-50">
-            <RefreshCw /> Refresh
+            <RefreshCw
+              className={`mr-0.5 h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+            />
+            {refreshing ? "Refreshing..." : "Refresh"}
           </Button>
           {
             isAdmin &&
