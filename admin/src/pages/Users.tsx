@@ -174,21 +174,64 @@ const Users = () => {
     setSelectedUser(user);
     setIsDeleteModalOpen(true);
   };
-  const handleDeleteUser =async()=> {
-    if(!selectedUser) return;
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
     setLoading(true);
     try {
       await axiosPrivate.delete(`/users/${selectedUser?._id}`);
       toast.success("Success", {
-        description: "The user account has been permanently removed"});
-        fetchUsers();
+        description: "The user account has been permanently removed"
+      });
+      fetchUsers();
     } catch (error) {
       console.log("Failed to delete user", error);
       toast("Action Failed", {
-        description:"Failed to delete user"
+        description: "Failed to delete user"
       });
     }
   };
+
+  // Form Edit (edit User)
+  const formEdit = useForm<FormData>({
+    resolver: zodResolver(userSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      role: "user",
+      avatar: "",
+    },
+  });
+
+  // Edit User (Form edit)
+  const handleEdit = (user: User) => {
+    setSelectedUser(user)
+    formEdit.reset({
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+    });
+    setAvatarFile(null);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateUser = async (data: FormData) => {
+    if (!selectedUser) return;
+    setFormLoading(true);
+     try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("email", data.email);
+      formData.append("role", data.role);
+      if(avatarFile) formData.append("avatar", avatarFile);
+
+      await axiosPrivate.put(`/users/${selectedUser._id}`, formData);
+     } catch (error) {
+      toast("Failed to update user");
+     } finally {
+      setFormLoading(false);
+     }
+    };
 
   return (
     <div className="p-6 space-y-4">
@@ -262,7 +305,13 @@ const Users = () => {
                     <Button variant={"ghost"} size="icon" title="View user details" className="border-border">
                       <Eye />
                     </Button>
-                    <Button variant={"ghost"} size="icon" title="Edit user" className="border-border">
+                    <Button
+                      variant={"ghost"}
+                      size="icon"
+                      title="Edit
+                    user" className="border-border"
+                      onClick={() => handleEdit(user)}
+                    >
                       <Edit />
                     </Button>
                     <Button variant={"ghost"} size="icon"
@@ -281,7 +330,7 @@ const Users = () => {
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="sm:max-w-137 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Add Users</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold">Add Users</DialogTitle>
             <DialogDescription>Create a new user account</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -364,6 +413,76 @@ const Users = () => {
                 <Button type="submit" disabled={formLoading}>
                   {formLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Create User
+                </Button>
+              </div>
+            </FieldSet>
+          </form>
+
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit user Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-137 max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-semibold">Edit User</DialogTitle>
+            <DialogDescription>Edit existing user account</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={formEdit.handleSubmit(handleUpdateUser)}>
+            <FieldSet>
+              {/* Name */}
+              <Field>
+                <FieldLabel>Name</FieldLabel>
+                <Input {...formEdit.register("name")} placeholder="Full name" />
+                {errors.name && <FieldError>{errors.name.message}</FieldError>}
+              </Field>
+
+              {/* Email */}
+              <Field>
+                <FieldLabel>Email</FieldLabel>
+                <Input {...formEdit.register("email")} placeholder="email@example.com" />
+                {errors.email && <FieldError>{errors.email.message}</FieldError>}
+              </Field>
+
+              {/* Role */}
+              <Field>
+                <FieldLabel>Role</FieldLabel>
+                <Select
+                  defaultValue={formEdit.getValues("role")}
+                  onValueChange={(value) =>
+                    setValue("role", value as any)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="deliveryman">Delivery Man</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+
+              {/* Avatar */}
+              <Field>
+                <FieldLabel>Avatar</FieldLabel>
+                <input type="file" className="cursor-pointer text-xs hover:text-green-600" onChange={handleAvatarChange} />
+              </Field>
+
+              {/* Footer */}
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
+                  Cancel
+                </Button>
+
+                <Button type="submit" disabled={formLoading}>
+                  {formLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Update
                 </Button>
               </div>
             </FieldSet>
