@@ -69,3 +69,41 @@ export const deleteUser = asyncHandler(async (req, res) => {
     userId: req.params.id,
   });
 });
+
+// Update User (ADMIN) 
+
+export const updateUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Email conflict check
+  if (req.body.email && req.body.email !== user.email) {
+    const emailExists = await User.findOne({ email: req.body.email });
+    if (emailExists) {
+      res.status(400);
+      throw new Error("Email already in use");
+    }
+  }
+
+  user.name = req.body.name ?? user.name;
+  user.email = req.body.email ?? user.email;
+  user.role = req.body.role ?? user.role;
+
+  if (req.file) {
+    user.avatar = `/uploads/${req.file.filename}`;
+  }
+
+  const updatedUser = await user.save();
+
+  res.status(200).json({
+    _id: updatedUser._id,
+    name: updatedUser.name,
+    email: updatedUser.email,
+    role: updatedUser.role,
+    avatar: updatedUser.avatar,
+  });
+});

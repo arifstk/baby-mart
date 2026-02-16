@@ -10,7 +10,12 @@
 // export default router;
 
 import express from "express";
-import { getUsers, createUser, deleteUser } from "../controllers/userController.js";
+import {
+  getUsers,
+  createUser,
+  deleteUser,
+  updateUser,
+} from "../controllers/userController.js";
 import { protect, admin } from "../middleware/authMiddleWare.js";
 import multer from "multer";
 
@@ -24,7 +29,11 @@ router
   .get(protect, admin, getUsers)
   .post(protect, admin, upload.single("avatar"), createUser);
 
+router.route("/:id").delete(protect, admin, deleteUser);
 
-  router.route("/:id").delete(protect, admin, deleteUser);
+router
+  .route("/:id")
+  .put(protect, admin, upload.single("avatar"), updateUser)
+  .delete(protect, admin, deleteUser);
 
 export default router;

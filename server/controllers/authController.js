@@ -1,3 +1,5 @@
+// authControllers.js
+
 // control Reg & login
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";

@@ -1,6 +1,8 @@
 import asyncHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
+import multer from "multer";
+import path from "path";
 
 // Protect routes
 const protect = asyncHandler(async (req, res, next) => {
@@ -28,8 +30,8 @@ const protect = asyncHandler(async (req, res, next) => {
     throw new Error("Not authorized, no token found");
   }
 });
-// Admin Middleware
 
+// Admin Middleware
 export const admin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
     next();
@@ -40,3 +42,28 @@ export const admin = (req, res, next) => {
 };
 
 export { protect };
+
+// Edit user (ADMIN)
+const storage = multer.diskStorage({
+  destination(req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename(req, file, cb) {
+    cb(
+      null,
+      `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`
+    );
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new Error("Images only"), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
+
+export default upload;

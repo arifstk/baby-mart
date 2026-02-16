@@ -64,12 +64,18 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
 };
 
 // Encrypt password using bcryptJS
-userSchema.pre("save", async function(next) {
-  if(!this.isModified("password")) {
-    next();
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+// userSchema.pre("save", async function() {
+//   if(!this.isModified("password")) return;
+
+//   // const salt = await bcrypt.genSalt(10);
+//   // this.password = await bcrypt.hash(this.password, salt);
+//   this.password = await bcrypt.hash(this.password, 10);
+// });
+
+userSchema.pre("save", async function () {
+  if (!this.isModified("password")) return;
+
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
 // Ensure only one address is default
