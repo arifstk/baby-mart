@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Field, FieldError, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { userSchema } from "@/lib/validation";
+import { userSchema, userUpdateSchema } from "@/lib/validation";
 import type z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +22,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 
 
 type FormData = z.infer<typeof userSchema>
+type editFormData = z.infer<typeof userUpdateSchema>
 
 const Users = () => {
   const [users, setUsers] = useState<UserType[]>([]);
@@ -192,8 +193,8 @@ const Users = () => {
   };
 
   // Form Edit (edit User)
-  const formEdit = useForm<FormData>({
-    resolver: zodResolver(userSchema),
+  const formEdit = useForm<editFormData>({
+    resolver: zodResolver(userUpdateSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -215,23 +216,31 @@ const Users = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateUser = async (data: FormData) => {
+  const handleUpdateUser = async (data: editFormData) => {
     if (!selectedUser) return;
     setFormLoading(true);
-     try {
+    try {
       const formData = new FormData();
       formData.append("name", data.name);
       formData.append("email", data.email);
       formData.append("role", data.role);
-      if(avatarFile) formData.append("avatar", avatarFile);
+      if (avatarFile) formData.append("avatar", avatarFile);
 
       await axiosPrivate.put(`/users/${selectedUser._id}`, formData);
-     } catch (error) {
-      toast("Failed to update user");
-     } finally {
+      toast.success("User updated successfully");
+      //  { headers: { "Content-Type": "multipart/form-data" },
+      // });
+      // Close modal and reset status
+      setIsEditModalOpen(false);
+      setAvatarFile(null);
+      // Refresh users list 
+      fetchUsers();
+    } catch (error) {
+      toast.error("Failed to update user");
+    } finally {
       setFormLoading(false);
-     }
-    };
+    }
+  };
 
   return (
     <div className="p-6 space-y-4">
@@ -322,7 +331,11 @@ const Users = () => {
                   </div>
                 </TableCell>
               </TableRow>
-            ))) : <div className="text-lg font-semibold p-5">No users</div>}
+            ))) :
+              <TableRow>
+                <TableCell className="text-lg font-semibold p-5">No users</TableCell>
+              </TableRow>
+            }
           </TableBody>
         </Table>
       </div>
@@ -421,7 +434,7 @@ const Users = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Edit user Modal */}
+      {/* Edit user Modal --------------------- */}
       <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
         <DialogContent className="sm:max-w-137 max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -450,7 +463,7 @@ const Users = () => {
                 <Select
                   defaultValue={formEdit.getValues("role")}
                   onValueChange={(value) =>
-                    setValue("role", value as any)
+                    setValue("role", value as FormData["role"])
                   }
                 >
                   <SelectTrigger>
@@ -463,6 +476,26 @@ const Users = () => {
                   </SelectContent>
                 </Select>
               </Field>
+
+              {/* Role - Fixed version */}
+              {/* <Field>
+                <FieldLabel>Role</FieldLabel>
+                <Select
+                  value={formEdit.watch("role")}
+                  onValueChange={(value) =>
+                    formEdit.setValue("role", value as editFormData["role"])
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="deliveryman">Delivery Man</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field> */}
 
               {/* Avatar */}
               <Field>
