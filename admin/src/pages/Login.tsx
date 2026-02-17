@@ -17,6 +17,7 @@ import { Link, useNavigate } from "react-router"
 import { loginSchema } from "@/lib/validation"
 import { Loader2 } from "lucide-react";
 import useAuthStore from "@/store/useAuthStore"
+import { toast } from "sonner"
 // import { useNavigate } from "react-router-dom"
 
 // const schema = z.object({
@@ -31,7 +32,7 @@ type FormData = z.infer<typeof loginSchema>
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const {login}= useAuthStore();
+  const { login } = useAuthStore();
 
   //2: 
   // const form = useForm <FormData>({
@@ -50,12 +51,19 @@ export default function Login() {
     resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit =async (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     setIsLoading(true)
     // console.log("Login data:", data);
     try {
       await login(data);
-      navigate("/dashboard");
+      toast.success("Login successful", {
+        description: "Welcome back to the admin dashboard",
+      });
+      // navigate("/dashboard");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 800);
+      
     } catch (error) {
       console.error("Fail to login", error);
     } finally {
@@ -104,8 +112,8 @@ export default function Login() {
 
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ?
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 className="animate-spin" /> Signing in...
+                <span className="flex items-center justify-center gap-2">
+                  <Loader2 className="animate-spin" /> Signing in...
                 </span> : "Login"}
             </Button>
 
