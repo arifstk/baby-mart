@@ -92,6 +92,7 @@ export const updateUser = asyncHandler(async (req, res) => {
   user.name = req.body.name ?? user.name;
   user.email = req.body.email ?? user.email;
   user.role = req.body.role ?? user.role;
+  user.addresses = req.body.addresses || user.addresses;
 
   if (req.file) {
     user.avatar = `/uploads/${req.file.filename}`;
@@ -105,5 +106,6 @@ export const updateUser = asyncHandler(async (req, res) => {
     email: updatedUser.email,
     role: updatedUser.role,
     avatar: updatedUser.avatar,
+    addresses: updatedUser.addresses,
   });
 });
