@@ -37,3 +37,44 @@ router
   .delete(protect, admin, deleteUser);
 
 export default router;
+
+
+
+
+// import express from "express";
+// import {
+//   getUsers,
+//   createUser,
+//   deleteUser,
+//   updateUser,
+// } from "../controllers/userController.js";
+
+// import upload, { protect, admin } from "../middleware/authMiddleware.js";
+
+// const router = express.Router();
+
+// // GET users
+// router.get("/", protect, admin, getUsers);
+
+// // CREATE user (avatar upload)
+// router.post(
+//   "/",
+//   protect,
+//   admin,
+//   upload.single("avatar"), // ✅ THIS IS REQUIRED
+//   createUser
+// );
+
+// // UPDATE user (avatar upload)
+// router.put(
+//   "/:id",
+//   protect,
+//   admin,
+//   upload.single("avatar"), // ✅ THIS IS REQUIRED
+//   updateUser
+// );
+
+// // DELETE user
+// router.delete("/:id", protect, admin, deleteUser);
+
+// export default router;
