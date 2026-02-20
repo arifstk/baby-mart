@@ -2,6 +2,7 @@
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import cloudinary from "../config/cloudinary.js";
+import { log } from "console";
 
 const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find({}).select("-password");
@@ -33,8 +34,10 @@ export const createUser = asyncHandler(async (req, res) => {
   if (req.file && req.file.path) {
     try {
       const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "babymart/avatars",
+        folder: "baby-mart/avatars",
       });
+      log("Avatar upload result:", result);
+
       avatar = result.secure_url;
     } catch (err) {
       console.error("Cloudinary upload failed:", err);
@@ -95,7 +98,6 @@ export const deleteUser = asyncHandler(async (req, res) => {
 });
 
 // ✅ Update User (ADMIN)
-
 export const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
 
@@ -158,7 +160,7 @@ export const updateUser = asyncHandler(async (req, res) => {
     if (req.file && req.file.path) {
       console.log("Updating avatar file:", req.file.path);
       const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "babymart/avatars",
+        folder: "baby-mart/avatars",
       });
       user.avatar = result.secure_url;
     }
