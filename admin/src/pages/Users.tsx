@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import useAuthStore from "@/store/useAuthStore";
-import { Edit, Eye, Loader2, Plus, RefreshCw, Trash, Upload, Users2 } from "lucide-react";
+import { Edit, Eye, Loader2, Plus, RefreshCw, Search, Trash, Upload, Users2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { User, UserType } from "../../type";
 import { Badge } from "@/components/ui/badge";
@@ -53,9 +53,28 @@ const Users = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axiosPrivate.get("/users");
+      // Add a small delay to show loading state (for demo purposes)
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      const response = await axiosPrivate.get("/users", {
+        params: {
+          page,
+          perPage,
+          sortOrder: "desc",
+          role: roleFilter !== "all" ? roleFilter : undefined,
+        },
+      });
       // console.log('response', response);
-      setUsers(response?.data);
+      // setUsers(response?.data);
+      if (response.data.users) {
+        setUsers(response.data.users);
+        setTotal(response.data.total || response.data.users.length);
+        setTotalPage(response.data.totalPages || 1);
+      } else {
+        setUsers(response.data);
+        setTotal(response.data.length);
+        setTotalPage(1);
+      }
 
     } catch (error) {
       console.log("Failed to load users", error);
@@ -64,9 +83,9 @@ const Users = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // useEffect(() => {
+  //   fetchUsers();
+  // }, [page, perPage, roleFilter]);
   // console.log("users", users);
 
   // Refresh Users
@@ -171,6 +190,17 @@ const Users = () => {
     }
   };
 
+  const filteredUser = users.filter((user)=> {
+    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesRole = roleFilter === "all" || user.role === roleFilter;
+    return matchesSearch && matchesRole;
+  }) 
+
+  useEffect(() => {
+    fetchUsers();
+  }, [page, perPage, roleFilter]);
+
   // Delete User
   const handleDelete = (user: User) => {
     setSelectedUser(user);
@@ -244,7 +274,7 @@ const Users = () => {
   };
 
   // View User Details
-  const handleView=(user:User) => {
+  const handleView = (user: User) => {
     setSelectedUser(user);
     setIsViewModalOpen(true);
   }
@@ -284,6 +314,30 @@ const Users = () => {
       </div>
 
       {/* Filters */}
+      <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Search className="w-4 h-4 text-gray-500" />
+            <Input
+              placeholder="Search users..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-64"
+            />
+          </div>
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filter by role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="user">User</SelectItem>
+              <SelectItem value="deliveryman">Delivery Person</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       {/* Users Table  */}
       <div className="bg-white rounded-lg shadow-sm">
         <Table>
@@ -299,7 +353,7 @@ const Users = () => {
           </TableHeader>
 
           <TableBody>
-            {users?.length > 0 ? (users?.map((user) => (
+            {filteredUser?.length > 0 ? (filteredUser?.map((user) => (
               <TableRow key={user?._id}>
                 <TableCell>
                   <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center overflow-hidden">
@@ -319,7 +373,7 @@ const Users = () => {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button variant={"ghost"} size="icon" title="View user details" className="border-border"
-                    onClick={()=>handleView(user)}
+                      onClick={() => handleView(user)}
                     >
                       <Eye />
                     </Button>
