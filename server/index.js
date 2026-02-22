@@ -1,5 +1,8 @@
 // index.js (server)
 
+import dns from "dns";
+dns.setDefaultResultOrder("ipv4first");
+
 import express from "express";
 import dotenv from "dotenv";
 import authRoutes from "./routes/authRoutes.js";
@@ -7,6 +10,7 @@ import userRoute from "./routes/userRoute.js";
 import connectDB from "./config/db.js";
 import cors from "cors";
 import path from "path";
+
 
 // load env Server
 dotenv.config();
@@ -19,7 +23,7 @@ const PORT = process.env.PORT || 8000;
 connectDB();
 
 // Core's configuration
-const allowedOrigins = [process.env.ADMIN_UR].filter(Boolean); // Remove any undefined values
+const allowedOrigins = [process.env.ADMIN_URL].filter(Boolean); // Remove any undefined values
 
 app.use(
   cors({
@@ -33,7 +37,7 @@ app.use(
       // Production cases
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTION"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
