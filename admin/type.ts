@@ -25,5 +25,12 @@ export interface User {
 //   avatar?: FileList
 // }
 
+export interface Brand {
+  _id: string;
+  name: string;
+  image?: string;
+  createdAt: string;
+}
+
 
 

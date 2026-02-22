@@ -22,7 +22,7 @@ export const registerSchema = z.object({
   }),
 });
 
-// User Schema 
+// User Schema
 export const userSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -45,3 +45,8 @@ export const userUpdateSchema = z.object({
   avatar: z.string().optional(),
 });
 
+// Brand Schema
+export const brandSchema = z.object({
+  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
+  image: z.string().optional(),
+});
