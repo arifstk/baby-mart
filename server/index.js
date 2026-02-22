@@ -5,11 +5,14 @@ dns.setDefaultResultOrder("ipv4first");
 
 import express from "express";
 import dotenv from "dotenv";
-import authRoutes from "./routes/authRoutes.js";
-import userRoute from "./routes/userRoute.js";
 import connectDB from "./config/db.js";
 import cors from "cors";
 import path from "path";
+
+// Routes 
+import authRoutes from "./routes/authRoutes.js";
+import userRoute from "./routes/userRoute.js";
+import brandRoutes from "./routes/brandRoutes.js";
 
 
 // load env Server
@@ -53,6 +56,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 // });
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoute);
+app.use("/api/brands", brandRoutes);
 
 // API Documentation
 
