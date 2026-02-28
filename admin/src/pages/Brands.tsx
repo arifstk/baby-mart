@@ -1,215 +1,3 @@
-// // Brands.tsx
-
-// import { Button } from "@/components/ui/button";
-// import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-// import { Field, FieldError, FieldLabel, FieldSet } from "@/components/ui/field";
-// import { ImageUpload } from "@/components/ui/imageUpload";
-// import { Input } from "@/components/ui/input";
-// import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
-// import { brandSchema } from "@/lib/validation";
-// import useAuthStore from "@/store/useAuthStore";
-// import { zodResolver } from "@hookform/resolvers/zod";
-// import { Loader2, Plus, RefreshCcw } from "lucide-react";
-// import { useEffect, useState } from "react";
-// import { useForm } from "react-hook-form";
-// import { toast } from "sonner";
-// import type { Brand } from "type";
-// import type z from "zod";
-
-
-// // type FormData = z.infer<typeof brandSchema>
-//  type FormData = {
-//     name: string;
-//     image?: File;
-//   };
-
-// const Brands = () => {
-//   const [brands, setBrands] = useState<Brand[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [refreshing, setRefreshing] = useState(false);
-//   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-//   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-//   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-//   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
-//   const [formLoading, setFormLoading] = useState(false);
-//   const axiosPrivate = useAxiosPrivate();
-
-//   //check isAdmin ??
-//   const { checkIsAdmin } = useAuthStore();
-//   const isAdmin = checkIsAdmin();
-
-//   // form states (Add)
-//   const formAdd = useForm<FormData>({
-//     resolver: zodResolver(brandSchema),
-//     defaultValues: {
-//       name: "",
-//       image: undefined,
-//     },
-//   });
-
-//   // form states (Edit)
-//   // const formEdit = useForm<FormData>({
-//   //   resolver: zodResolver(brandSchema),
-//   //   defaultValues: {
-//   //     name: "",
-//   //     image: "",
-//   //   },
-//   // });
-
-//   // check brands on mount
-//   const fetchBrands = async () => {
-//     setLoading(true);
-//     try {
-//       const response = await axiosPrivate.get("/brands");
-//       // console.log("response", response?.data);
-//       setBrands(response?.data);
-//     } catch (error) {
-//       console.error("Failed to fetch brands:", error);
-//       toast.error("Failed to fetch brands. Please try again.");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const handleRefresh = async () => {
-//     try {
-//       const response = await axiosPrivate.get("/brands");
-//       setBrands(response?.data);
-//       toast.success("Brands refreshed successfully");
-//     } catch (error) {
-//       console.log("Failed to refresh brands:", error);
-//       toast.error("Failed to refresh brands");
-//     } finally {
-//       setRefreshing(false);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchBrands();
-//   }, []);
-
-//   // Add brand 
-//   const handleAddBrand = async (data: FormData) => {
-//     setFormLoading(true);
-//     try {
-//       const formData = new FormData();
-//       formData.append("name", data.name);
-
-//       if (data.image instanceof File) {
-//         formData.append("image", data.image);
-//       }
-
-//       await axiosPrivate.post("/brands", formData, {
-//         headers: {
-//           "Content-Type": "multipart/form-data",
-//         },
-//       });
-
-//       toast.success("Brand created successfully");
-//       formAdd.reset();
-//       setIsAddModalOpen(false);
-//       fetchBrands();
-//     } catch (error) {
-//       console.error("Create brand failed:", error);
-//       toast.error("Failed to create brand");
-//     } finally {
-//       setFormLoading(false);
-//     }
-//   };
-//   console.log("Brands", brands);
-
-
-//   return (
-//     <div className="space-y-6 p-4">
-//       <div className="flex justify-between items-center">
-//         <h1 className="text-3xl font-bold">Brands</h1>
-//         <div className="flex items-center gap-2">
-//           <Button
-//             onClick={handleRefresh}
-//             variant={"outline"} disabled={refreshing}>
-//             <RefreshCcw
-//               className={`mr-2 h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
-//             />{refreshing ? "Refreshing..." : "Refresh"}
-//           </Button>
-//           {isAdmin &&
-//             <Button onClick={() => setIsAddModalOpen(true)}>
-//               <Plus className="mr-2 h-4 w-4" />Add Brand
-//             </Button>}
-//         </div>
-//       </div>
-//       {/* Add Modal */}
-//       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-//         <DialogContent>
-//           <DialogHeader>
-//             <DialogTitle>Add New Brand</DialogTitle>
-//             <DialogDescription>
-//               Fill in the details to add a new brand.
-//             </DialogDescription>
-//           </DialogHeader>
-
-//           <form onSubmit={formAdd.handleSubmit(handleAddBrand)}>
-//             <FieldSet>
-//               {/* Brand Name */}
-//               <Field>
-//                 <FieldLabel>Name</FieldLabel>
-//                 <Input
-//                   {...formAdd.register("name")}
-//                   placeholder="Brand name"
-//                   disabled={formLoading}
-//                 />
-//                 <FieldError>
-//                   {formAdd.formState.errors.name?.message}
-//                 </FieldError>
-//               </Field>
-
-//               {/* Brand Image */}
-//               <Field>
-//                 <FieldLabel>Brand Image (optional)</FieldLabel>
-//                 {/* <ImageUpload
-//                   value={formAdd.watch("image") ?? ""}
-//                   onChange={(value) => formAdd.setValue("image", value)}
-//                   disabled={formLoading}
-//                 /> */}
-//                 <ImageUpload
-//                   onChange={(file) => formAdd.setValue("image", file)}
-//                   disabled={formLoading}
-//                 />
-//                 <FieldError>
-//                   {formAdd.formState.errors.image?.message}
-//                 </FieldError>
-//               </Field>
-//             </FieldSet>
-
-//             {/* FOOTER */}
-//             <div className="flex justify-end gap-3 pt-4">
-//               <Button
-//                 type="button"
-//                 variant="outline"
-//                 onClick={() => setIsAddModalOpen(false)}
-//                 disabled={formLoading}
-//               >
-//                 Cancel
-//               </Button>
-
-//               <Button type="submit" disabled={formLoading}>
-//                 {formLoading && (
-//                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-//                 )}
-//                 Create Brand
-//               </Button>
-//             </div>
-//           </form>
-
-//         </DialogContent>
-//       </Dialog>
-//     </div>
-//   );
-// };
-
-// export default Brands
-
-
-
 // Brands.tsx
 
 import { useEffect, useState } from "react";
@@ -360,6 +148,44 @@ const Brands = () => {
         </div>
       </div>
 
+      {/* BRANDS LIST */}
+      {loading ? (
+        <div className="flex justify-center py-20">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : brands.length === 0 ? (
+        <div className="text-center py-20 text-muted-foreground">
+          No brands found
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          {brands.map((brand) => (
+            <div
+              key={brand._id}
+              className="border rounded-xl p-4 flex flex-col items-center gap-3 hover:shadow-sm transition"
+            >
+              {/* IMAGE */}
+              <div className="h-24 w-24 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+                {brand.image ? (
+                  <img
+                    src={brand.image}
+                    alt={brand.name}
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-xs text-muted-foreground">
+                    No Image
+                  </span>
+                )}
+              </div>
+
+              {/* NAME */}
+              <p className="font-medium text-center">{brand.name}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* ADD BRAND MODAL */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent>
@@ -369,15 +195,21 @@ const Brands = () => {
               Create a brand with optional image
             </DialogDescription>
           </DialogHeader>
-
+          
           <form onSubmit={formAdd.handleSubmit(handleAddBrand)}>
             <FieldSet>
               {/* NAME */}
               <Field>
                 <FieldLabel>Brand Name</FieldLabel>
                 <Input
-                  {...formAdd.register("name", { required: "Name is required" })}
-                  placeholder="Brand name"
+                  {...formAdd.register("name", {
+                    required: "Name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters"
+                    }
+                  })}
+                  placeholder="Enter brand name"
                   disabled={formLoading}
                 />
                 <FieldError>
@@ -389,13 +221,18 @@ const Brands = () => {
               <Field>
                 <FieldLabel>Brand Image (optional)</FieldLabel>
                 <ImageUpload
-                  disabled={formLoading}
-                  onChange={(file) =>
+                  onChange={(file) => {
+                    console.log("Image selected:", file);
                     formAdd.setValue("image", file, {
-                      shouldDirty: true,
-                    })
-                  }
+                      shouldValidate: true,
+                      shouldDirty: true
+                    });
+                  }}
+                  disabled={formLoading}
                 />
+                <FieldError>
+                  {formAdd.formState.errors.image?.message as string}
+                </FieldError>
               </Field>
             </FieldSet>
 
@@ -403,16 +240,16 @@ const Brands = () => {
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => setIsAddModalOpen(false)}
+                onClick={() => {
+                  setIsAddModalOpen(false);
+                  formAdd.reset();
+                }}
                 disabled={formLoading}
               >
                 Cancel
               </Button>
-
               <Button type="submit" disabled={formLoading}>
-                {formLoading && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+                {formLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Brand
               </Button>
             </div>

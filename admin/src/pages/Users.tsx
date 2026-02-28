@@ -90,13 +90,14 @@ const Users = () => {
 
   // Refresh Users
   const handleRefresh = async () => {
+    if (refreshing) return; // Prevent multiple clicks
     setRefreshing(true);
     try {
       const response = await axiosPrivate.get("/users", {
         params: {
           page,
           perPage,
-          role: roleFilter !== "alt" ? roleFilter : undefined,
+          role: roleFilter !== "all" ? roleFilter : undefined,
         }
       });
       // console.log("response", response);

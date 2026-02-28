@@ -1,95 +1,5 @@
-// // brandController.js
-// import asyncHandler from "express-async-handler";
-// import Brand from "../models/brandModel.js";
-// import cloudinary from "../config/cloudinary.js";
 
-// // getBrands
-// const getBrands = asyncHandler(async (req, res) => {
-//   const brands = await Brand.find();
-//   res.json(brands);
-// });
-
-// // CreateBrand
-// const createBrand = asyncHandler(async (req, res) => {
-//   const { name, image } = req.body;
-
-//   const brandExists = await Brand.findOne({ name });
-//   if (brandExists) {
-//     req.statusCode(400);
-//     throw new Error("Brand already exists, try another name");
-//   }
-//   let imageUrl = "";
-//   if (image) {
-//     const result = await cloudinary.uploader.upload(image, {
-//       folder: "baby-mart/brands",
-//     });
-//     imageUrl = result.secure_url;
-//   }
-
-//   const brand = await Brand.create({
-//     name,
-//     image: imageUrl || undefined,
-//   });
-//   if (brand) {
-//     res.status(201).json(brand);
-//   } else {
-//     res.status(400);
-//     throw new Error("Invalid brand data");
-//   }
-// });
-
-// // getBrandById
-// const getBrandById = asyncHandler(async (req, res) => {
-//   const brand = await Brand.findById(req.params.id);
-//   if (brand) {
-//     res.json(brand);
-//   } else {
-//     res.status(404);
-//     throw new Error("Brand not found");
-//   }
-// });
-
-// // updateBrand
-// const updateBrand = asyncHandler(async (req, res) => {
-//   const { name, image } = req.body;
-//   const brand = await Brand.findById(req.params.id);
-//   if (brand) {
-//     brand.name = name || brand.name;
-
-//     if (image !== undefined) {
-//       if (image) {
-//         const result = await cloudinary.uploader.upload(image, {
-//           folder: "baby-mart/brands",
-//         });
-//         brand.image = result.secure_url;
-//       } else {
-//         brand.image = undefined;
-//       }
-//     }
-
-//     const updateBrand = await brand.save();
-//     res.json(updateBrand);
-//   } else {
-//     res.status(404);
-//     throw new Error("Brand not found");
-//   }
-// });
-
-// // deleteBrand
-// const deleteBrand = asyncHandler(async (req, res) => {
-//   const brand = await Brand.findById(req.params.id);
-
-//   if (brand) {
-//     await brand.deleteOne();
-//     res.status(200).json({ message: "Brand removed" });
-//   } else {
-//     res.status(404);
-//     throw new Error("Brand not found");
-//   }
-// });
-
-// export { getBrands, createBrand, getBrandById, updateBrand, deleteBrand };
-
+// server/controllers/brandController.js
 import asyncHandler from "express-async-handler";
 import Brand from "../models/brandModel.js";
 import cloudinary from "../config/cloudinary.js";
@@ -106,70 +16,90 @@ const getBrands = asyncHandler(async (req, res) => {
 // @route   POST /api/brands
 // @access  Admin
 const createBrand = asyncHandler(async (req, res) => {
-  const name = req.body?.name;
+  console.log("=== CREATE BRAND DEBUG ===");
+  console.log("Request body:", req.body);
+  console.log("Request file:", req.file);
+  console.log("Request headers:", req.headers["content-type"]);
+
+  const { name } = req.body;
 
   if (!name) {
+    console.log("❌ Name is missing");
     res.status(400);
     throw new Error("Brand name is required");
   }
 
+  // Check if brand exists
   const brandExists = await Brand.findOne({ name });
   if (brandExists) {
+    console.log("❌ Brand already exists:", name);
     res.status(400);
-    throw new Error("Brand already exists, try another name");
+    throw new Error("Brand already exists");
   }
 
-  // ✅ IMAGE UPLOAD CASE
+  let imageUrl = "";
+
+  // Handle image upload if file exists
   if (req.file) {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      { folder: "baby-mart/brands" },
-      async (error, result) => {
-        if (error) {
-          console.error("Cloudinary error:", error);
-          res.status(500);
-          throw new Error("Image upload failed");
-        }
+    console.log("✅ File received:", {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      buffer: req.file.buffer ? "Buffer exists" : "No buffer",
+    });
 
-        const brand = await Brand.create({
-          name,
-          image: {
-            public_id: result.public_id,
-            url: result.secure_url,
+    try {
+      // Upload to Cloudinary
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "baby-mart/brands",
+            resource_type: "auto",
           },
-        });
+          (error, result) => {
+            if (error) {
+              console.error("❌ Cloudinary upload error:", error);
+              reject(error);
+            } else {
+              console.log("✅ Cloudinary upload success:", result.secure_url);
+              resolve(result);
+            }
+          },
+        );
 
-        return res.status(201).json(brand);
-      },
-    );
+        uploadStream.end(req.file.buffer);
+      });
 
-    uploadStream.end(req.file.buffer);
-    return; // 🔴 REQUIRED — stop function execution
+      imageUrl = result.secure_url;
+    } catch (error) {
+      console.error("❌ Image upload failed:", error);
+      res.status(500);
+      throw new Error("Image upload failed: " + error.message);
+    }
+  } else {
+    console.log("ℹ️ No image file received");
   }
 
-  // ✅ NO IMAGE CASE
-  const brand = await Brand.create({ name });
+  // Create brand
+  console.log("Creating brand with:", { name, imageUrl });
+  const brand = await Brand.create({
+    name,
+    image: imageUrl,
+  });
+
+  console.log("✅ Brand created:", brand);
   res.status(201).json(brand);
-});
-
-// @desc    Get brand by ID
-// @route   GET /api/brands/:id
-// @access  Public
-const getBrandById = asyncHandler(async (req, res) => {
-  const brand = await Brand.findById(req.params.id);
-
-  if (!brand) {
-    res.status(404);
-    throw new Error("Brand not found");
-  }
-
-  res.json(brand);
 });
 
 // @desc    Update brand
 // @route   PUT /api/brands/:id
 // @access  Admin
 const updateBrand = asyncHandler(async (req, res) => {
-  const { name, image } = req.body;
+  console.log("=== UPDATE BRAND DEBUG ===");
+  console.log("Brand ID:", req.params.id);
+  console.log("Request body:", req.body);
+  console.log("Request file:", req.file);
+
   const brand = await Brand.findById(req.params.id);
 
   if (!brand) {
@@ -177,34 +107,51 @@ const updateBrand = asyncHandler(async (req, res) => {
     throw new Error("Brand not found");
   }
 
-  brand.name = name || brand.name;
+  // Update name if provided
+  if (req.body.name) {
+    brand.name = req.body.name;
+  }
 
-  if (image !== undefined) {
-    // if (image) {
-    //   const result = await cloudinary.uploader.upload(image, {
-    //     folder: "baby-mart/brands",
-    //   });
-    //   brand.image = result.secure_url;
-    // } else {
-    //   brand.image = undefined;
-    // }
+  // Update image if provided
+  if (req.file) {
+    console.log("✅ File received for update:", {
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+    });
 
-    if (image) {
-      try {
-        const result = await cloudinary.uploader.upload(image, {
-          folder: "baby-mart/brands",
-        });
-        imageUrl = result.secure_url;
-      } catch (err) {
-        console.error("Cloudinary upload error:", err);
-        return res.status(400).json({
-          message: "Image upload failed",
-        });
-      }
+    try {
+      // Upload to Cloudinary
+      const result = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: "baby-mart/brands",
+            resource_type: "auto",
+          },
+          (error, result) => {
+            if (error) {
+              console.error("❌ Cloudinary upload error:", error);
+              reject(error);
+            } else {
+              console.log("✅ Cloudinary upload success:", result.secure_url);
+              resolve(result);
+            }
+          },
+        );
+
+        uploadStream.end(req.file.buffer);
+      });
+
+      brand.image = result.secure_url;
+    } catch (error) {
+      console.error("❌ Image upload failed:", error);
+      res.status(500);
+      throw new Error("Image upload failed");
     }
   }
 
   const updatedBrand = await brand.save();
+  console.log("✅ Brand updated:", updatedBrand);
   res.json(updatedBrand);
 });
 
@@ -220,7 +167,21 @@ const deleteBrand = asyncHandler(async (req, res) => {
   }
 
   await brand.deleteOne();
-  res.status(200).json({ message: "Brand removed" });
+  res.json({ message: "Brand removed" });
+});
+
+// @desc    Get brand by ID
+// @route   GET /api/brands/:id
+// @access  Public
+const getBrandById = asyncHandler(async (req, res) => {
+  const brand = await Brand.findById(req.params.id);
+
+  if (!brand) {
+    res.status(404);
+    throw new Error("Brand not found");
+  }
+
+  res.json(brand);
 });
 
 export { getBrands, createBrand, getBrandById, updateBrand, deleteBrand };

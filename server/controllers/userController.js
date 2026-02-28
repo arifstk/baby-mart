@@ -1,21 +1,43 @@
-// userController.js
+// server/controllers/userController.js
 import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import cloudinary from "../config/cloudinary.js";
-import { log } from "console";
 
-const getUsers = asyncHandler(async (req, res) => {
+/* ----------------------------------------
+   Helper: Upload buffer to Cloudinary
+----------------------------------------- */
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader
+      .upload_stream(
+        {
+          folder: "baby-mart/avatars",
+          resource_type: "image",
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve(result);
+        },
+      )
+      .end(buffer);
+  });
+};
+
+/* ----------------------------------------
+   Get all users (ADMIN)
+----------------------------------------- */
+export const getUsers = asyncHandler(async (req, res) => {
   const users = await User.find({}).select("-password");
   res.json(users);
 });
 
-export { getUsers };
-
-//✅ Create user (ADMIN)
+/* ----------------------------------------
+   Create user (ADMIN)
+----------------------------------------- */
 export const createUser = asyncHandler(async (req, res) => {
   const { name, email, password, role } = req.body;
 
-  // check existing user
+  // Check existing user
   const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400);
@@ -24,69 +46,45 @@ export const createUser = asyncHandler(async (req, res) => {
 
   let avatar = "";
 
-  // if (req.file) {
-  //   const result = await cloudinary.uploader.upload(req.file.path, {
-  //     folder: "babymart/avatars",
-  //   });
-  //   avatar = result.secure_url;
-  // }
-
-  if (req.file && req.file.path) {
+  // Upload avatar if exists
+  if (req.file?.buffer) {
     try {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "baby-mart/avatars",
-      });
-      log("Avatar upload result:", result);
-
+      const result = await uploadToCloudinary(req.file.buffer);
       avatar = result.secure_url;
-    } catch (err) {
-      console.error("Cloudinary upload failed:", err);
+    } catch (error) {
+      console.error("Cloudinary upload failed:", error);
       res.status(500);
-      throw new Error("Avatar upload failed. Check Cloudinary settings.");
+      throw new Error("Avatar upload failed");
     }
   }
 
-  // if user not exist (create new user)
   const user = await User.create({
     name,
     email,
     password,
     role,
-    // avatar: req.file ? req.file.path : "",
-    avatar: avatar,
+    avatar,
   });
 
-  // res.status(201).json(user);
-  if (user) {
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      avatar: user.avatar,
-      role: user.role,
-      addresses: user.addresses,
-    });
-  } else {
-    res.status(400);
-    throw new Error("Invalid user data");
-  }
+  res.status(201).json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    avatar: user.avatar,
+    addresses: user.addresses,
+  });
 });
 
-//✅ Delete user (ADMIN)
+/* ----------------------------------------
+   Delete user (ADMIN)
+----------------------------------------- */
 export const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
 
   if (!user) {
     res.status(404);
     throw new Error("User not found");
-
-    // Delete user's cart
-    // await Cart.deleteOne({userId: user._id});
-
-    // Delete user's orders (if any exist)
-    // await OverconstrainedError.deleteMany({userId:user._id});
-
-    // Delete the user
   }
 
   await user.deleteOne();
@@ -97,7 +95,9 @@ export const deleteUser = asyncHandler(async (req, res) => {
   });
 });
 
-// ✅ Update User (ADMIN)
+/* ----------------------------------------
+   Update user (ADMIN)
+----------------------------------------- */
 export const updateUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
 
@@ -118,58 +118,20 @@ export const updateUser = asyncHandler(async (req, res) => {
   user.name = req.body.name ?? user.name;
   user.email = req.body.email ?? user.email;
   user.role = req.body.role ?? user.role;
-  user.addresses = req.body.addresses || user.addresses;
+  user.addresses = req.body.addresses ?? user.addresses;
 
-  // Image setup
-  // if(req.body.avatar && req.body.avatar !== user.avatar) {
-  //   // Upload user to Cloudinary
-  //   const result = await cloudinary.uploader.upload(req.body.avatar, {
-  //     folder: "babymart/avatars",
-  //   });
-  //   console.log("Avatar Result", result);
-
-  //   user.avatar = result.secure_url; // Save the secure URL from Cloudinary
-  // }
-
-  // if (req.file) {
-  //   user.avatar = `/uploads/${req.file.filename}`;
-  // }
-
-  // AVATAR UPLOAD
-  // if (req.file) {
-  //   const result = await cloudinary.uploader.upload(req.file.path, {
-  //     folder: "babymart/avatars",
-  //   });
-
-  //   user.avatar = result.secure_url;
-  // }
-
-  // const updatedUser = await user.save();
-
-  // res.status(200).json({
-  //   _id: updatedUser._id,
-  //   name: updatedUser.name,
-  //   email: updatedUser.email,
-  //   role: updatedUser.role,
-  //   avatar: updatedUser.avatar,
-  //   addresses: updatedUser.addresses,
-  // });
-
-  // AVATAR UPLOAD
-  try {
-    if (req.file && req.file.path) {
-      console.log("Updating avatar file:", req.file.path);
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: "baby-mart/avatars",
-      });
+  // Upload new avatar if provided
+  if (req.file?.buffer) {
+    try {
+      const result = await uploadToCloudinary(req.file.buffer);
       user.avatar = result.secure_url;
+    } catch (err) {
+      console.error("Cloudinary upload error:", err);
+      res.status(500);
+      throw new Error("Failed to upload avatar");
     }
-  } catch (err) {
-    console.error("Cloudinary upload error:", err);
-    res.status(500);
-    throw new Error("Failed to upload avatar");
   }
-
+ 
   const updatedUser = await user.save();
 
   res.status(200).json({

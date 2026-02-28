@@ -9,6 +9,8 @@
 
 // export default router;
 
+
+// userRoute.js
 import express from "express";
 import {
   getUsers,
@@ -17,12 +19,14 @@ import {
   updateUser,
 } from "../controllers/userController.js";
 import { protect, admin } from "../middleware/authMiddleWare.js";
-import multer from "multer";
+import upload from "../middleware/uploadMiddleware.js";
+// import upload from "../middleware/uploadMiddleware.js";
+// import multer from "multer";
 
 const router = express.Router();
 
 // multer config
-const upload = multer({ dest: "uploads/" });
+// const upload = multer({ dest: "uploads/" });
 
 router
   .route("/")

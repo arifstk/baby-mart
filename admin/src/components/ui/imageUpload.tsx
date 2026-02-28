@@ -1,154 +1,95 @@
-// // imageUpload.tsx (optional)
-// // Delete this file because of it not in used.
-
-
-
-// import { useEffect, useState } from "react";
-
-// interface ImageUploadProps {
-//   value: string;
-//   onChange: (base64: string) => void;
-//   disabled?: boolean;
-// }
-
-// export function ImageUplaod({ value, onChange, disabled }: ImageUploadProps) {
-//   const [preview, setPreview] = useState<string | null>(null);
-
-//   useEffect (()=> {
-//     if (value) {
-//       setPreview(value);
-//     }
-//   }, [value]);
-
-
-// };
-
-
-// import { useEffect, useState } from "react";
-
-// interface ImageUploadProps {
-//   // value?: string;
-//   // onChange: (base64: string) => void;
-//   onChange: (file: File | null) => void;
-//   disabled?: boolean;
-// }
-
-// export function ImageUpload({
-//   // value,
-//   onChange,
-//   disabled,
-// }: ImageUploadProps) {
-//   const [preview, setPreview] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     if (value) {
-//       setPreview(value);
-//     }
-//   }, [value]);
-
-//   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = e.target.files?.[0];
-//     if (!file) return;
-
-//     if (!file.type.startsWith("image/")) {
-//       alert("Only image files allowed");
-//       return;
-//     }
-
-//     if (file.size > 2 * 1024 * 1024) {
-//       alert("Image must be under 2MB");
-//       return;
-//     }
-
-//     const reader = new FileReader();
-//     reader.onloadend = () => {
-//       const base64 = reader.result as string;
-//       setPreview(base64);
-//       onChange(file);
-//     };
-//     reader.readAsDataURL(file);
-//     e.target.value = "";
-//   };
-
-//   return (
-//     <div className="space-y-2">
-//       {preview ? (
-//         <div className="h-32 w-32 overflow-hidden rounded-md border">
-//           <img
-//             src={preview}
-//             alt="Preview"
-//             className="h-full w-full object-cover"
-//           />
-//         </div>
-//       ) : (
-//         <div className="h-32 w-32 flex items-center justify-center rounded-md border text-xs text-muted-foreground">
-//           No Image
-//         </div>
-//       )}
-
-//       <input
-//         type="file"
-//         accept="image/png,image/jpeg,image/webp"
-//         // onChange={handleFileChange}
-//         onChange={(e) => onChange(e.target.files?.[0] || null)}
-//         disabled={disabled}
-//         className="block w-full text-xs"
-//       />
-//     </div>
-//   );
-// }
-
-
-import { useState } from "react";
+// components/ui/imageUpload.tsx
+import { useState, useRef } from "react";
+import { Image as ImageIcon, X } from "lucide-react";
+import { Button } from "./button";
 
 interface ImageUploadProps {
   onChange: (file: File | undefined) => void;
+  value?: File;
   disabled?: boolean;
 }
 
 export function ImageUpload({ onChange, disabled }: ImageUploadProps) {
   const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
 
+    if (!file) {
+      onChange(undefined);
+      return;
+    }
+
+    // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Only image files allowed");
+      alert("Please upload an image file");
       return;
     }
 
+    // Validate file size (2MB)
     if (file.size > 2 * 1024 * 1024) {
-      alert("Image must be under 2MB");
+      alert("File size must be less than 2MB");
       return;
     }
 
-    setPreview(URL.createObjectURL(file));
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
     onChange(file);
   };
 
+  const handleRemove = () => {
+    setPreview(null);
+    onChange(undefined);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {preview ? (
-        <div className="h-32 w-32 overflow-hidden rounded-md border">
+        <div className="relative w-40 h-40 rounded-md overflow-hidden border">
           <img
             src={preview}
             alt="Preview"
-            className="h-full w-full object-cover"
+            className="w-full h-full object-cover"
           />
+          <Button
+            type="button"
+            onClick={handleRemove}
+            variant="destructive"
+            size="icon"
+            className="absolute top-2 right-2 h-8 w-8"
+            disabled={disabled}
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       ) : (
-        <div className="h-32 w-32 flex items-center justify-center rounded-md border text-xs text-muted-foreground">
-          No Image
+        <div
+          onClick={() => !disabled && fileInputRef.current?.click()}
+          className="w-40 h-40 rounded-md border-2 border-dashed flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition"
+        >
+          <ImageIcon className="h-8 w-8 text-muted-foreground mb-2" />
+          <p className="text-xs text-muted-foreground text-center px-2">
+            Click to upload image
+          </p>
+          <p className="text-xs text-muted-foreground">(Max 2MB)</p>
         </div>
       )}
-
       <input
+        ref={fileInputRef}
         type="file"
-        accept="image/png,image/jpeg,image/webp"
+        accept="image/*"
         onChange={handleFileChange}
         disabled={disabled}
-        className="block w-full text-xs"
+        className="hidden"
       />
     </div>
   );
