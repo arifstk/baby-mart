@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Loader2, Plus, RefreshCcw } from "lucide-react";
+import { Loader2, Pencil, Plus, RefreshCcw, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +25,7 @@ import { ImageUpload } from "@/components/ui/imageUpload";
 import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import useAuthStore from "@/store/useAuthStore";
 import type { Brand } from "type";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 /* -----------------------------
    Form Type (NO ZOD HERE)
@@ -40,6 +41,8 @@ const Brands = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const axiosPrivate = useAxiosPrivate();
   const { checkIsAdmin } = useAuthStore();
@@ -49,6 +52,13 @@ const Brands = () => {
      React Hook Form
   -------------------------------- */
   const formAdd = useForm<BrandFormData>({
+    defaultValues: {
+      name: "",
+      image: undefined,
+    },
+  });
+
+  const formEdit = useForm<BrandFormData>({
     defaultValues: {
       name: "",
       image: undefined,
@@ -121,6 +131,31 @@ const Brands = () => {
   /* -----------------------------
      UI
   -------------------------------- */
+  const handleEdit = (brand: Brand) => {
+    setSelectedBrand(brand);
+    formEdit.reset({
+      name: brand.name,
+      image: brand.image || "",
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateBrand = async (data: FormData) => {
+    if (!selectedBrand) return;
+    setFormLoading(true);
+    try {
+      await axiosPrivate.put(`/brands/${selectedBrand._id}`, data);
+      toast.success("Brand updated successfully");
+      setIsEditModalOpen(false);
+      fetchBrands();
+    } catch (error) {
+      console.log("Failed to update brand", error);
+      toast.error("Failed to update brand");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6 p-4">
       <div className="flex justify-between items-center">
@@ -158,31 +193,75 @@ const Brands = () => {
           No brands found
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {brands.map((brand) => (
-            <div
-              key={brand._id}
-              className="border rounded-xl p-4 flex flex-col items-center gap-3 hover:shadow-sm transition"
-            >
-              {/* IMAGE */}
-              <div className="h-24 w-24 rounded-md overflow-hidden bg-muted flex items-center justify-center">
-                {brand.image ? (
-                  <img
-                    src={brand.image}
-                    alt={brand.name}
-                    className="h-full w-full object-contain"
-                  />
-                ) : (
-                  <span className="text-xs text-muted-foreground">
-                    No Image
-                  </span>
-                )}
-              </div>
+        <div className="rounded-xl border bg-background">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-20">Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
 
-              {/* NAME */}
-              <p className="font-medium text-center">{brand.name}</p>
-            </div>
-          ))}
+            <TableBody>
+              {brands.map((brand) => (
+                <TableRow key={brand._id}>
+                  {/* IMAGE */}
+                  <TableCell>
+                    <div className="h-10 w-10 rounded-md overflow-hidden bg-muted flex items-center justify-center">
+                      {brand.image ? (
+                        <img
+                          src={brand.image}
+                          alt={brand.name}
+                          className="h-full w-full object-contain"
+                        />
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          No<br />Image
+                        </span>
+                      )}
+                    </div>
+                  </TableCell>
+
+                  {/* NAME */}
+                  <TableCell className="font-medium">
+                    {brand.name}
+                  </TableCell>
+
+                  {/* CREATED AT */}
+                  <TableCell>
+                    {brand.createdAt
+                      ? new Date(brand.createdAt).toLocaleDateString()
+                      : "—"}
+                  </TableCell>
+
+                  {/* ACTIONS */}
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8"
+                        onClick={() => handleEdit(brand)}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-8 w-8 text-destructive"
+                      // onClick={()=> handleDelete(brand)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       )}
 
@@ -195,7 +274,7 @@ const Brands = () => {
               Create a brand with optional image
             </DialogDescription>
           </DialogHeader>
-          
+
           <form onSubmit={formAdd.handleSubmit(handleAddBrand)}>
             <FieldSet>
               {/* NAME */}
@@ -256,6 +335,96 @@ const Brands = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* EDIT BRAND MODAL */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Brand</DialogTitle>
+            <DialogDescription>
+              Update brand information
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={formEdit.handleSubmit(handleUpdateBrand)}>
+            <FieldSet>
+              {/* NAME */}
+              <Field>
+                <FieldLabel>Brand Name</FieldLabel>
+                <Input
+                  {...formEdit.register("name", {
+                    required: "Name is required",
+                    minLength: {
+                      value: 2,
+                      message: "Name must be at least 2 characters",
+                    },
+                  })}
+                  placeholder="Enter brand name"
+                  disabled={formLoading}
+                />
+                <FieldError>
+                  {formEdit.formState.errors.name?.message}
+                </FieldError>
+              </Field>
+
+              {/* IMAGE */}
+              <Field>
+                <FieldLabel>Replace Brand Image (optional)</FieldLabel>
+                <ImageUpload
+                  onChange={(file) => {
+                    console.log("New image selected:", file);
+                    formEdit.setValue("image", file, {
+                      shouldDirty: true,
+                      shouldValidate: true,
+                    });
+                  }}
+                  disabled={formLoading}
+                />
+                <FieldError>
+                  {formEdit.formState.errors.image?.message as string}
+                </FieldError>
+              </Field>
+
+              {/* CURRENT IMAGE PREVIEW */}
+              {selectedBrand?.image && (
+                <div className="pt-2">
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Current Image
+                  </p>
+                  <img
+                    src={selectedBrand.image}
+                    alt={selectedBrand.name}
+                    className="h-16 rounded-md border"
+                  />
+                </div>
+              )}
+            </FieldSet>
+
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsEditModalOpen(false);
+                  setSelectedBrand(null);
+                  formEdit.reset();
+                }}
+                disabled={formLoading}
+              >
+                Cancel
+              </Button>
+
+              <Button type="submit" disabled={formLoading}>
+                {formLoading && (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                Update Brand
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };
