@@ -135,21 +135,35 @@ const Brands = () => {
     setSelectedBrand(brand);
     formEdit.reset({
       name: brand.name,
-      image: brand.image || "",
+      image: undefined,
     });
     setIsEditModalOpen(true);
   };
 
-  const handleUpdateBrand = async (data: FormData) => {
+  const handleUpdateBrand = async (data: BrandFormData) => {
     if (!selectedBrand) return;
+
     setFormLoading(true);
+
     try {
-      await axiosPrivate.put(`/brands/${selectedBrand._id}`, data);
+      const formData = new FormData();
+      formData.append("name", data.name);
+
+      if (data.image) {
+        formData.append("image", data.image);
+      }
+
+      await axiosPrivate.put(
+        `/brands/${selectedBrand._id}`,
+        formData
+      );
+
       toast.success("Brand updated successfully");
       setIsEditModalOpen(false);
+      setSelectedBrand(null);
       fetchBrands();
     } catch (error) {
-      console.log("Failed to update brand", error);
+      console.error("Failed to update brand", error);
       toast.error("Failed to update brand");
     } finally {
       setFormLoading(false);
