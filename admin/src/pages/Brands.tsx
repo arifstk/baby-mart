@@ -26,6 +26,7 @@ import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import useAuthStore from "@/store/useAuthStore";
 import type { Brand } from "type";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 /* -----------------------------
    Form Type (NO ZOD HERE)
@@ -43,6 +44,7 @@ const Brands = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const axiosPrivate = useAxiosPrivate();
   const { checkIsAdmin } = useAuthStore();
@@ -170,6 +172,27 @@ const Brands = () => {
     }
   };
 
+  /* -----------------------------
+    Delete Brand
+  -------------------------------- */
+  const handleDelete = (brand: Brand) => {
+    setSelectedBrand(brand);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteBrand = async () => {
+    if (!selectedBrand) return;
+    try {
+      await axiosPrivate.delete(`/brands/${selectedBrand._id}`);
+      toast.success("Brand deleted successfully!");
+      setIsDeleteModalOpen(false);
+      fetchBrands();
+    } catch (error) {
+      console.log("Failed to delete brand", error);
+      toast.error("Failed to delete brand");
+    }
+  };
+
   return (
     <div className="space-y-6 p-4">
       <div className="flex justify-between items-center">
@@ -266,7 +289,7 @@ const Brands = () => {
                         size="icon"
                         variant="ghost"
                         className="h-8 w-8 text-destructive"
-                      // onClick={()=> handleDelete(brand)}
+                        onClick={() => handleDelete(brand)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -438,6 +461,29 @@ const Brands = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* DELETE BRAND MODAL */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              brand <span className="font-semibold">{selectedBrand?.name}</span>
+              .
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteBrand}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </div>
   );
