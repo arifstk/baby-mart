@@ -32,5 +32,12 @@ export interface Brand {
   createdAt: string;
 }
 
-
+export interface Category {
+  _id: string;
+  name: string;
+  email: string;
+  image?: string;
+  categoryType: "Featured" | "Hot Categories" | "Top Categories";
+  createdAt: string;
+}
 

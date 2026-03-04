@@ -2,7 +2,6 @@ import api from "@/lib/config";
 import { create } from "zustand";
 import { persist } from "zustand/middleware"; //save local storage
 
-
 interface User {
   _id: string,
   name: string,
@@ -10,7 +9,6 @@ interface User {
   avatar: string,
   role: "admin" | "user" | "deliveryman",
 }
-
 interface AuthState {
   user: User | null;
   token: string | null;
@@ -78,7 +76,6 @@ const useAuthStore = create<AuthState>()(
     },
   ),
 );
-
 export default useAuthStore
 
  

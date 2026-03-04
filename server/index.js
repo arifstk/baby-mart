@@ -13,6 +13,7 @@ import path from "path";
 import authRoutes from "./routes/authRoutes.js";
 import userRoute from "./routes/userRoute.js";
 import brandRoutes from "./routes/brandRoutes.js";
+import categoryRoutes from "./routes/categoryRoutes.js"; 
 
 // load env Server
 dotenv.config();
@@ -56,6 +57,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoute);
 app.use("/api/brands", brandRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // API Documentation
 

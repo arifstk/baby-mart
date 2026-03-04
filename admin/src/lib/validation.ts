@@ -75,3 +75,12 @@ export const brandSchema = z.object({
       message: "Image must be smaller than 2MB",
     }),
 });
+
+export const categorySchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  image: z.string().optional(),
+  categoryType: z.enum(["Featured", "Hot Categories", "Top Categories"], {
+    message: "Please select a valid category type",
+  }),
+});
+
