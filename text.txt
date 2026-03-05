@@ -1,5 +1,13 @@
+// Personal:
+
+Noor Mohammad (ENGLISH):   https://www.youtube.com/@reactjsBD 
+Noor Mohammad (BANGLA):   https://www.youtube.com/@codingwithnoor 
+
 Next. JS full stack  Project Bangla: 26/01/2026 (Video Link):
 https://www.youtube.com/watch?v=YOfx--j3A48&list=PL4JYC8uutjoKrL8IcPzIkQgreXQpY3rAq&index=3
+
+https://www.youtube.com/watch?v=Qetq2QEChtk&list=PLOl4xN4eJVEP3AAIhueYYd9NYKqBw08vh (English Full Project)
+
 
 
 Create a folder: baby-mart
@@ -62,6 +70,7 @@ Is this OK? (yes) yes
 
 
 $ node
+$ node
 Welcome to Node.js v24.11.1.
 Hello World!
 undefined
@@ -86,6 +95,8 @@ to run the server: npm start
     "start": "nodemon index.js",
     "dev": "nodemon index.js"
   },
+
+
 
 
 ADMIN:
@@ -161,7 +172,7 @@ const connectDB = async()=> {
 
 export default connectDB;
 
-in index.js file >
+in indexf.js file >
 // Connect to Database
 connectDB();
 
@@ -190,12 +201,30 @@ ADMIN (frontend):
 	install ZUSTAND   npm install zustand
 	create file store > useAuthStore.ts (to store signin & reg info in database).
 	
-	create a file to integrate api:  lib > api.ts & config.ts 
+	create a file to integrate api:  lib > api.ts & config.ts
 	install axios from npm:   npm i axios 
 	create .env file,
 	
 SEVER:  to prevent this error "Access to XMLHttpRequest at 'http://localhost:8000/api/auth/register' from origin 'http://localhost:5173' has been blocked by 	CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested 	resource." 
 	install CORS from npm, npm i cors 
 	Server > index.js file Core's configuration.
-	Now in registration page, fill up this form and click register button, then the register process done.
+	Now in registration page, fillup this form and click register button, then the register process done.
+
+
+ADMIN:	create pages.
+	fetch user data in the Users.tsx page.
+	to fetch data modify in the SERVER side > routes>UserRoute.js
+	in server>index.js file- //Routes
+	app.use("/api/users", userRoute);
+	import userRoute from "./routes/userRoute.js"; 
+
+	create server>controllers>userController.js file,
+	configure export {getUsers} in this userController.js file.
+	
+	then create this route in userRoute.js file, then configure this-- router.route("/").get(getUsers); 
+	
+	design the user.tsx page.
+
+	
+	
 
