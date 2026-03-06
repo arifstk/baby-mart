@@ -16,7 +16,7 @@ const categorySchema = mongoose.Schema(
     },
     categoryType: {
       type: String,
-      enum: ["Featured", "Hot Categories", "Top Categories"], // Mandatory field with specific values
+      enum: ["Featured", "Hot-Categories", "Top-Categories"], // Mandatory field with specific values
     },
   },
   {
