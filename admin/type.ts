@@ -37,7 +37,7 @@ export interface Category {
   name: string;
   email: string;
   image?: string;
-  categoryType: "Featured" | "Hot Categories" | "Top Categories";
+  categoryType: "Featured" | "Hot-Categories" | "Top-Categories";
   createdAt: string;
 }
 

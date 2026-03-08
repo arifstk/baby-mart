@@ -45,19 +45,6 @@ export const userUpdateSchema = z.object({
   avatar: z.string().optional(),
 });
 
-// Brand Schema
-// export const brandSchema = z.object({
-//   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-//   // image: z.string().optional(),
-//   image: z
-//     .any()
-//     .optional()
-//     .refine(
-//       (file) => !file || file instanceof File,
-//       "Please upload a valid image file",
-//     ),
-// });
-
 export const brandSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
 
@@ -78,7 +65,7 @@ export const brandSchema = z.object({
 
 export const categorySchema = z.object({
   name: z.string().min(1, "Name is required"),
-  image: z.string().optional(),
+  image: z.any().optional(),
   categoryType: z.enum(["Featured", "Hot-Categories", "Top-Categories"], {
     message: "Please select a valid category type",
   }),
@@ -86,8 +73,9 @@ export const categorySchema = z.object({
 
 export const categoryUpdateSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  image: z.string().optional(),
+  image: z.any().optional(),
   categoryType: z.enum(["Featured", "Hot-Categories", "Top-Categories"], {
     message: "Please select a valid category type",
-  }),
+  }).optional(),
 });
+
