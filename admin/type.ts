@@ -39,5 +39,19 @@ export interface Category {
   image?: string;
   categoryType: "Featured" | "Hot-Categories" | "Top-Categories";
   createdAt: string;
-}
+};
+
+export interface Product {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  discountPercentage: number;
+  stock: number;
+  averageRating: number;
+  image: string;
+  category: Category;
+  brand: Brand;
+  createdAt: string;
+};
 

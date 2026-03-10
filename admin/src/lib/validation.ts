@@ -74,8 +74,49 @@ export const categorySchema = z.object({
 export const categoryUpdateSchema = z.object({
   name: z.string().min(1, "Name is required"),
   image: z.any().optional(),
-  categoryType: z.enum(["Featured", "Hot-Categories", "Top-Categories"], {
-    message: "Please select a valid category type",
-  }).optional(),
+  categoryType: z
+    .enum(["Featured", "Hot-Categories", "Top-Categories"], {
+      message: "Please select a valid category type",
+    })
+    .optional(),
 });
 
+// export const productSchema = z.object({
+//   name: z.string().min(1, "Name is required"),
+//   image: z.any().optional(),
+//   categoryType: z.enum(["Featured", "Hot-Categories", "Top-Categories"], {
+//     message: "Please select a valid category type",
+//   }),
+// });
+
+export const productSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  price: z.number().min(0, "Price must be positive"),
+  discountPercentage: z.number().min(0).max(100).optional(),
+  stock: z.number().min(0).optional(),
+  categoryId: z.string().min(1, "Category is required"),
+  brandId: z.string().min(1, "Brand is required"),
+  image: z.any().optional(),
+});
+
+// export const productUpdateSchema = z.object({
+//   name: z.string().min(1, "Name is required"),
+//   image: z.any().optional(),
+//   categoryType: z
+//     .enum(["Featured", "Hot-Categories", "Top-Categories"], {
+//       message: "Please select a valid category type",
+//     })
+//     .optional(),
+// });
+
+export const productUpdateSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().min(1, "Description is required"),
+  price: z.number().min(0, "Price must be positive"),
+  discountPercentage: z.number().min(0).max(100).optional(),
+  stock: z.number().min(0).optional(),
+  categoryId: z.string().min(1, "Category is required"),
+  brandId: z.string().min(1, "Brand is required"),
+  image: z.any().optional(),
+});

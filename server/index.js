@@ -13,7 +13,8 @@ import path from "path";
 import authRoutes from "./routes/authRoutes.js";
 import userRoute from "./routes/userRoute.js";
 import brandRoutes from "./routes/brandRoutes.js";
-import categoryRoutes from "./routes/categoryRoutes.js"; 
+import categoryRoutes from "./routes/categoryRoutes.js";
+import productRoutes from "./routes/productRoutes.js"; 
 
 // load env Server
 dotenv.config();
@@ -58,6 +59,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoute);
 app.use("/api/brands", brandRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
 
 // API Documentation
 
@@ -76,65 +78,4 @@ app.listen(PORT, () => {
   console.log(`API docs available at: http://localhost:${PORT}/api/docs`);
 });
 
-// import dns from "dns";
-// dns.setDefaultResultOrder("ipv4first");
 
-// import express from "express";
-// import dotenv from "dotenv";
-// import connectDB from "./config/db.js";
-// import cors from "cors";
-// import path from "path";
-
-// // Routes
-// import authRoutes from "./routes/authRoutes.js";
-// import userRoute from "./routes/userRoute.js";
-// import brandRoutes from "./routes/brandRoutes.js";
-
-// dotenv.config();
-
-// const app = express();
-// const PORT = process.env.PORT || 8000;
-
-// // DB
-// connectDB();
-
-// // CORS
-// const allowedOrigins = [process.env.ADMIN_URL, process.env.CLIENT_URL].filter(
-//   Boolean,
-// );
-
-// app.use(
-//   cors({
-//     origin(origin, callback) {
-//       if (!origin) return callback(null, true);
-//       if (process.env.NODE_ENV === "development") return callback(null, true);
-//       if (allowedOrigins.includes(origin)) return callback(null, true);
-//       return callback(new Error("Not allowed by CORS"));
-//     },
-//     credentials: true,
-//   }),
-// );
-
-// // Middleware
-// app.use(express.json({ limit: "50mb" }));
-// app.use(express.urlencoded({ limit: "50mb", extended: true }));
-
-// app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
-
-// // Routes
-// app.use("/api/auth", authRoutes);
-// app.use("/api/users", userRoute);
-// app.use("/api/brands", brandRoutes);
-
-// // Home
-// app.get("/", (req, res) => {
-//   res.send("Hello from Baby mart!!");
-// });
-
-// // Start Server setup
-// app.listen(PORT, () => {
-//   console.log(`Server is running on ${PORT}`);
-//   console.log(`Client URL: ${process.env.CLIENT_URL}`);
-//   console.log(`Admin URL: ${process.env.ADMIN_URL}`);
-//   console.log(`API docs available at: http://localhost:${PORT}/api/docs`);
-// });

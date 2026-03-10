@@ -54,7 +54,7 @@ const productSchema = mongoose.Schema(
     },
     image: {
       type: String,
-      required: true,
+      // required: true,
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
