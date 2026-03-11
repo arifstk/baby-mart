@@ -414,6 +414,35 @@ const Categories = () => {
         </Table>
       </div>
 
+      {/* Pagination */}
+{totalPages > 1 && (
+  <div className="flex items-center justify-between pt-2">
+    <p className="text-sm text-gray-500">
+      Page {page} of {totalPages}
+    </p>
+
+    <div className="flex gap-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setPage((p) => Math.max(1, p - 1))}
+        disabled={page === 1}
+      >
+        Previous
+      </Button>
+
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+        disabled={page === totalPages}
+      >
+        Next
+      </Button>
+    </div>
+  </div>
+)}
+
       {/* ── Add Category Modal ───── */}
       <Dialog open={isAddModalOpen} onOpenChange={(open) => {
         if (!open) { reset(); setImageFile(null); }
