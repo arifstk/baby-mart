@@ -9,7 +9,7 @@ import cloudinary from "../config/cloudinary.js";
 // @access  Public
 const getBrands = asyncHandler(async (req, res) => {
   const brands = await Brand.find();
-  res.json(brands);
+  res.json({brands});
 });
 
 // @desc    Create brand

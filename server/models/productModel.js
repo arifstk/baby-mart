@@ -77,8 +77,9 @@ productSchema.pre("save", function (next) {
   if (this.ratings && this.ratings.length > 0) {
     const sum = this.ratings.reduce((acc, item) => acc + item.rating, 0);
     this.averageRating = sum / this.ratings.length;
+  } else {
+    this.averageRating = 0;
   }
-  next();
 });
 
 const Product = mongoose.model("Product", productSchema);

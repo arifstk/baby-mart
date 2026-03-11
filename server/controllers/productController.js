@@ -35,7 +35,7 @@ const createProduct = asyncHandler(async (req, res) => {
     brand: brandId,
     discountPercentage: discountPercentage || 0,
     stock: stock || 0,
-    image: "",
+    image: imagePath,
   });
   if (product) {
     res.status(201).json(product);

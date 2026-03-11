@@ -170,36 +170,77 @@ const Products = () => {
   };
 
   // ── Add product ──
+  // const handleAddSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setFormLoading(true);
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("name", addForm.name);
+  //     formData.append("description", addForm.description);
+  //     formData.append("price", String(addForm.price));
+  //     formData.append("discountPercentage", String(addForm.discountPercentage));
+  //     formData.append("stock", String(addForm.stock));
+  //     formData.append("categoryId", addForm.categoryId);
+  //     formData.append("brandId", addForm.brandId);
+  //     if (imageFile) formData.append("image", imageFile);
+
+  //     await axiosPrivate.post("/products", formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+
+  //     toast.success("✅ Product added successfully");
+  //     setAddForm(emptyForm);
+  //     setImageFile(null);
+  //     setIsAddModalOpen(false);
+  //     fetchProducts();
+  //   } catch (error) {
+  //     console.error("Failed to create product", error);
+  //     toast.error("Failed to create product");
+  //   } finally {
+  //     setFormLoading(false);
+  //   }
+  // };
+
   const handleAddSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append("name", addForm.name);
-      formData.append("description", addForm.description);
-      formData.append("price", String(addForm.price));
-      formData.append("discountPercentage", String(addForm.discountPercentage));
-      formData.append("stock", String(addForm.stock));
-      formData.append("categoryId", addForm.categoryId);
-      formData.append("brandId", addForm.brandId);
-      if (imageFile) formData.append("image", imageFile);
+  e.preventDefault();
 
-      await axiosPrivate.post("/products", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+  if (!addForm.categoryId) {
+    toast.error("Please select a category");
+    return;
+  }
+  if (!addForm.brandId) {
+    toast.error("Please select a brand");
+    return;
+  }
 
-      toast.success("✅ Product added successfully");
-      setAddForm(emptyForm);
-      setImageFile(null);
-      setIsAddModalOpen(false);
-      fetchProducts();
-    } catch (error) {
-      console.error("Failed to create product", error);
-      toast.error("Failed to create product");
-    } finally {
-      setFormLoading(false);
-    }
-  };
+  setFormLoading(true);
+  try {
+    const formData = new FormData();
+    formData.append("name", addForm.name);
+    formData.append("description", addForm.description);
+    formData.append("price", String(addForm.price));
+    formData.append("discountPercentage", String(addForm.discountPercentage));
+    formData.append("stock", String(addForm.stock));
+    formData.append("categoryId", addForm.categoryId);
+    formData.append("brandId", addForm.brandId);
+    if (imageFile) formData.append("image", imageFile);
+
+    await axiosPrivate.post("/products", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+
+    toast.success("✅ Product added successfully");
+    setAddForm(emptyForm);
+    setImageFile(null);
+    setIsAddModalOpen(false);
+    fetchProducts();
+  } catch (error) {
+    console.error("Failed to create product", error);
+    toast.error("Failed to create product");
+  } finally {
+    setFormLoading(false);
+  }
+};
 
   // ── Edit product ──
   // product.category and product.brand are full objects 
@@ -364,7 +405,7 @@ const Products = () => {
           <SelectTrigger>
             <SelectValue placeholder="Select category" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent position="popper">
             {categories.map((cat: Category) => (
               <SelectItem key={cat._id} value={cat._id}>
                 {cat.name}
@@ -383,7 +424,7 @@ const Products = () => {
           <SelectTrigger>
             <SelectValue placeholder="Select brand" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent position="popper">
             {brands.map((brand: Brand) => (
               <SelectItem key={brand._id} value={brand._id}>
                 {brand.name}
