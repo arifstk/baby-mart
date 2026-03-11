@@ -1,7 +1,7 @@
 // productRoutes.js
 import express from "express";
 import upload, { admin, protect } from "../middleware/authMiddleWare.js";
-import { createProduct, getProducts } from "../controllers/productController.js";
+import { createProduct, deleteProduct, getProductById, getProducts, updateProduct } from "../controllers/productController.js";
 
 const router = express.Router();
 
@@ -9,6 +9,12 @@ const router = express.Router();
 router.route("/")
 .get(protect, getProducts)
 .post(protect, admin, upload.single("image"), createProduct);
+
+router
+  .route("/:id")
+  .get(protect, getProductById)
+  .put(protect, admin, upload.single("image"), updateProduct)
+  .delete(protect, admin, deleteProduct);
 
 // get Products
 // update Products
