@@ -74,9 +74,16 @@ const Brands = () => {
     try {
       setLoading(true);
       const res = await axiosPrivate.get("/brands");
-      setBrands(res.data);
+      const data =
+        res.data?.data ||
+        res.data?.brands ||
+        res.data ||
+        [];
+      setBrands(Array.isArray(data) ? data : []);
+      // setBrands(res.data.data);
     } catch (err) {
       toast.error("Failed to fetch brands");
+      setBrands([]);
     } finally {
       setLoading(false);
     }
@@ -93,10 +100,18 @@ const Brands = () => {
     try {
       setRefreshing(true);
       const res = await axiosPrivate.get("/brands");
-      setBrands(res.data);
+      const data =
+        res.data?.data ||
+        res.data?.brands ||
+        res.data ||
+        [];
+
+      setBrands(Array.isArray(data) ? data : []);
+      // setBrands(res.data.data);
       toast.success("Brands refreshed");
     } catch {
       toast.error("Refresh failed");
+      setBrands([]);
     } finally {
       setRefreshing(false);
     }
@@ -225,7 +240,7 @@ const Brands = () => {
         <div className="flex justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      ) : brands.length === 0 ? (
+      ) : !brands || brands.length === 0 ? (
         <div className="text-center py-20 text-muted-foreground">
           No brands found
         </div>
