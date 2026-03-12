@@ -25,4 +25,5 @@ try {
   console.error("❌ Cloudinary connection failed:", error);
 }
 
+
 export default cloudinary; 

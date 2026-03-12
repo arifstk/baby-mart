@@ -1,7 +1,8 @@
 // productRoutes.js
 import express from "express";
-import upload, { admin, protect } from "../middleware/authMiddleWare.js";
+import { admin, protect } from "../middleware/authMiddleWare.js";
 import { createProduct, deleteProduct, getProductById, getProducts, updateProduct } from "../controllers/productController.js";
+import upload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 

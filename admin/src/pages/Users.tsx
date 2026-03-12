@@ -83,11 +83,6 @@ const Users = () => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchUsers();
-  // }, [page, perPage, roleFilter]);
-  // console.log("users", users);
-
   // Refresh Users
   const handleRefresh = async () => {
     if (refreshing) return; // Prevent multiple clicks
@@ -102,8 +97,8 @@ const Users = () => {
       });
       // console.log("response", response);
       // Handle paginated and non-paginated response
-      if (response.data) {
-        setUsers(response.data);
+      if (response.data.users) {
+        setUsers(response.data.users);
         setTotal(response.data.total || response.data.users.length);
         setTotalPage(response.data.totalPages || 1);
       } else {
@@ -117,6 +112,7 @@ const Users = () => {
       toast("Failed to refresh users");
     } finally {
       setRefreshing(false);
+      toast.success("Users refreshed successfully");
     }
   };
 
@@ -292,7 +288,7 @@ const Users = () => {
         <div className="flex items-center gap-4 ">
           <div className="text-blue-600 flex items-center gap-1">
             <Users2 className="w-8 h-8" />
-            <p className="text-2xl font-bold">{total}</p> 
+            <p className="text-2xl font-bold">{total}</p>
           </div>
           <Button
             variant={"outline"}
@@ -405,6 +401,35 @@ const Users = () => {
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      {totalPage > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-sm text-gray-500">
+            Page {page} of {totalPage}
+          </p>
+
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Previous
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPage, p + 1))}
+              disabled={page === totalPage}
+            >
+              Next
+            </Button>
+          </div>
+        </div>
+      )}
       {/* Add user Modal  */}
       <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
         <DialogContent className="sm:max-w-137 max-h-[90vh] overflow-y-auto">

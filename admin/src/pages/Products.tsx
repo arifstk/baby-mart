@@ -1,4 +1,3 @@
-
 // Products.tsx
 import { Button } from "@/components/ui/button";
 import {
@@ -53,9 +52,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import type { Brand, Category, Product } from "type";
 
-// ── Local form state types (what we send to the API) ─────────────────────────
-// The API receives IDs for category/brand, but Product type stores full objects.
-// We keep form state separate from the Product interface.
 interface ProductFormState {
   name: string;
   description: string;
@@ -169,38 +165,6 @@ const Products = () => {
     if (e.target.files?.[0]) setImageFile(e.target.files[0]);
   };
 
-  // ── Add product ──
-  // const handleAddSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setFormLoading(true);
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("name", addForm.name);
-  //     formData.append("description", addForm.description);
-  //     formData.append("price", String(addForm.price));
-  //     formData.append("discountPercentage", String(addForm.discountPercentage));
-  //     formData.append("stock", String(addForm.stock));
-  //     formData.append("categoryId", addForm.categoryId);
-  //     formData.append("brandId", addForm.brandId);
-  //     if (imageFile) formData.append("image", imageFile);
-
-  //     await axiosPrivate.post("/products", formData, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-
-  //     toast.success("✅ Product added successfully");
-  //     setAddForm(emptyForm);
-  //     setImageFile(null);
-  //     setIsAddModalOpen(false);
-  //     fetchProducts();
-  //   } catch (error) {
-  //     console.error("Failed to create product", error);
-  //     toast.error("Failed to create product");
-  //   } finally {
-  //     setFormLoading(false);
-  //   }
-  // };
-
   const handleAddSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
@@ -225,9 +189,7 @@ const Products = () => {
     formData.append("brandId", addForm.brandId);
     if (imageFile) formData.append("image", imageFile);
 
-    await axiosPrivate.post("/products", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    await axiosPrivate.post("/products", formData);
 
     toast.success("✅ Product added successfully");
     setAddForm(emptyForm);
@@ -274,9 +236,7 @@ const Products = () => {
       formData.append("brandId", editForm.brandId);
       if (imageFile) formData.append("image", imageFile);
 
-      await axiosPrivate.put(`/products/${selectedProduct._id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axiosPrivate.put(`/products/${selectedProduct._id}`, formData);
 
       toast.success("Product updated successfully");
       setIsEditModalOpen(false);
@@ -322,7 +282,7 @@ const Products = () => {
     return "bg-green-100 text-green-800";
   };
 
-  // ── Shared form fields (used in both Add and Edit modals) ────────────────────
+  // ── Shared form fields (used in both Add and Edit modals)
   const renderFormFields = (
     form: ProductFormState,
     setForm: React.Dispatch<React.SetStateAction<ProductFormState>>,
