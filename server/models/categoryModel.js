@@ -12,10 +12,16 @@ const categorySchema = mongoose.Schema(
     image: {
       type: String,
       required: false, // Image is optional
-      // default: "",
+      default: "",
+    },
+    imagePublicId: {
+      type: String,
+      required: false, // Image public ID is optional
+      default: "",
     },
     categoryType: {
       type: String,
+      required: true,
       enum: ["Featured", "Hot-Categories", "Top-Categories"], // Mandatory field with specific values
     },
   },

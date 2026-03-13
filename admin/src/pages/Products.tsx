@@ -142,7 +142,7 @@ const Products = () => {
     setRefreshing(true);
     try {
       const response = await axiosPrivate.get("/products", {
-        params: { page, perPage, sortOrder },
+        params: { page, perPage, sortOrder }, 
       });
       setProducts(response?.data?.products || []);
       setTotal(response?.data?.total || 0);
